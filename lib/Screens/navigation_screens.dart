@@ -73,7 +73,7 @@ class _NavigationScreenState extends State<NavigationScreen>
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 5))
+    Future.delayed(const Duration(microseconds: 500))
         .then((value) => accounts = myProvider.getUserCreditAccounts);
     accounts = myProvider.getUserCreditAccounts;
     return accounts.isNotEmpty && widget.index == 0

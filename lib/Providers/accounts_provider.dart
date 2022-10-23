@@ -16,9 +16,10 @@ class AccountsProvider with ChangeNotifier {
       Hive.box<CreditAccount>(AppConfig.dataBaseBoxName);
   List<CreditAccount> _userCreditAccount = [];
 
-  void fetchDataBaseBox() {
+  Future<void> fetchDataBaseBox() async {
     log('test');
     _userCreditAccount = _dataBaseBox.values.toList().cast<CreditAccount>();
+    log(_userCreditAccount.length.toString());
     notifyListeners();
   }
 
@@ -26,7 +27,7 @@ class AccountsProvider with ChangeNotifier {
     required CreditAccount userAccount,
   }) async {
     _userCreditAccount.add(userAccount);
-    _dataBaseBox.put('test4', userAccount);
+    _dataBaseBox.add(userAccount);
     log(_userCreditAccount.toString());
     notifyListeners();
   }

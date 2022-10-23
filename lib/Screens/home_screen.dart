@@ -9,7 +9,7 @@ import 'package:masrufat/dialog/loading_screen_dialog.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import '../Widgets/bottom_shet.dart';
+import '../Widgets/bottom_sheet.dart';
 import 'navigation_screens.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -43,9 +43,11 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     myProvider = Provider.of<AccountsProvider>(context, listen: false);
+    Future.delayed(
+      const Duration(milliseconds: 500),
+      () => myProvider.fetchDataBaseBox(),
+    );
 
-    Future.delayed(const Duration(seconds: 2))
-        .then((value) => myProvider.fetchDataBaseBox());
     _animationController = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
