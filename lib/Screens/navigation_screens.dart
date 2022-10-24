@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../Providers/accounts_provider.dart';
 import '../Widgets/account_widgets/accounts_card.dart';
 
+// ignore: must_be_immutable
 class NavigationScreen extends StatefulWidget {
   static const routName = AppConfig.navigationRouteName;
   final IconData iconData;

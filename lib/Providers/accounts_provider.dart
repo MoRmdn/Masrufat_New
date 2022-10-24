@@ -27,8 +27,22 @@ class AccountsProvider with ChangeNotifier {
     required CreditAccount userAccount,
   }) async {
     _userCreditAccount.add(userAccount);
-    _dataBaseBox.add(userAccount);
+    _dataBaseBox.put(userAccount.id, userAccount);
     log(_userCreditAccount.toString());
+    notifyListeners();
+  }
+
+  Future<void> updateCreditAccount({
+    required CreditAccount updatedUserAccount,
+  }) async {
+    final oldAccountIndex = _userCreditAccount.indexWhere(
+      (element) => element.id == updatedUserAccount.id,
+    );
+    _userCreditAccount[oldAccountIndex] = updatedUserAccount;
+
+    log(updatedUserAccount.balance.toString());
+    //? save New Updated Account to DataBase
+    _dataBaseBox.put(updatedUserAccount.id, updatedUserAccount);
     notifyListeners();
   }
 

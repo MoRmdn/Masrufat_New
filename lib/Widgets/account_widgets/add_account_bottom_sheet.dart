@@ -9,10 +9,19 @@ import '../../dialog/loading_screen_dialog.dart';
 import '../../helper/app_config.dart';
 import '../custom_text_field.dart';
 
+enum SheetMood {
+  add,
+  update,
+}
+
 class AddAccountBottomSheet extends StatefulWidget {
   final VoidCallback onRefresh;
-  const AddAccountBottomSheet({Key? key, required this.onRefresh})
-      : super(key: key);
+  CreditAccount? accountToEdit;
+  AddAccountBottomSheet({
+    Key? key,
+    required this.onRefresh,
+    this.accountToEdit,
+  }) : super(key: key);
 
   @override
   State<AddAccountBottomSheet> createState() => _AddAccountBottomSheetState();
@@ -22,6 +31,7 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
   final TextEditingController accNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController balanceController = TextEditingController();
+  SheetMood mood = SheetMood.add;
   final loading = LoadingScreen.instance();
   late Size dSize;
   late AccountsProvider myProvider;
@@ -29,6 +39,8 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
   @override
   void initState() {
     myProvider = Provider.of<AccountsProvider>(context, listen: false);
+    _checkAccount();
+    if (mood == SheetMood.update) _updateMode();
     super.initState();
   }
 
@@ -38,6 +50,85 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
     descriptionController.dispose();
     balanceController.dispose();
     super.dispose();
+  }
+
+  void _updateMode() => setState(() {
+        accNameController.text = widget.accountToEdit!.name;
+        descriptionController.text = widget.accountToEdit!.description;
+        balanceController.text = widget.accountToEdit!.balance.toString();
+      });
+
+  void _onUpdateAccount() {
+    loading.show(context: context, content: AppConfig.pleaseWait);
+    final name = accNameController.text;
+    final description = descriptionController.text;
+    final balance = balanceController.text;
+    if (name.isEmpty || balance.isEmpty || description.isEmpty) {
+      customGenericDialog(
+        context: context,
+        title: AppConfig.dialogErrorTitle,
+        content: AppConfig.dialogErrorEmptyAccountName,
+        dialogOptions: () {
+          return {AppConfig.ok: true};
+        },
+      );
+      Future.delayed(const Duration(milliseconds: 500))
+          .then((value) => loading.hide());
+      return;
+    }
+    final oldBalance = widget.accountToEdit!.balance;
+    if (oldBalance > double.parse(balance)) {
+      final tranNewBalance = oldBalance - double.parse(balance);
+      List<Transactions> transactionList = widget.accountToEdit!.transactions;
+      transactionList.add(
+        Transactions(
+          id: DateTime.now().toIso8601String(),
+          name: 'EditedBalance',
+          isIncome: false,
+          balance: tranNewBalance,
+        ),
+      );
+      widget.accountToEdit = CreditAccount(
+        id: widget.accountToEdit!.id,
+        name: name,
+        description: description,
+        balance: double.parse(
+          balance,
+        ),
+        transactions: transactionList,
+      );
+      myProvider.updateCreditAccount(
+        updatedUserAccount: widget.accountToEdit!,
+      );
+    } else {
+      final tranNewBalance = double.parse(balance) - oldBalance;
+      List<Transactions> transactionList = widget.accountToEdit!.transactions;
+      transactionList.add(
+        Transactions(
+          id: DateTime.now().toIso8601String(),
+          name: 'EditedBalance',
+          isIncome: true,
+          balance: tranNewBalance,
+        ),
+      );
+      widget.accountToEdit = CreditAccount(
+        id: widget.accountToEdit!.id,
+        name: name,
+        description: description,
+        balance: double.parse(
+          balance,
+        ),
+        transactions: transactionList,
+      );
+      myProvider.updateCreditAccount(
+        updatedUserAccount: widget.accountToEdit!,
+      );
+    }
+
+    widget.onRefresh();
+    Future.delayed(const Duration(milliseconds: 500))
+        .then((value) => loading.hide());
+    Navigator.of(context).pop();
   }
 
   void _onAddAccount() {
@@ -79,6 +170,12 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
     Navigator.of(context).pop();
   }
 
+  void _checkAccount() => widget.accountToEdit == null
+      ? null
+      : setState(() {
+          mood = SheetMood.update;
+        });
+
   @override
   Widget build(BuildContext context) {
     dSize = MediaQuery.of(context).size;
@@ -114,7 +211,8 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
           ),
           SizedBox(height: dSize.height * 0.05),
           ElevatedButton(
-            onPressed: _onAddAccount,
+            onPressed:
+                mood == SheetMood.update ? _onUpdateAccount : _onAddAccount,
             child: const Text(AppConfig.addAccount),
           )
         ],
