@@ -46,6 +46,14 @@ class AccountsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteCreditAccount({
+    required CreditAccount updatedUserAccount,
+  }) async {
+    log('deleteCreditAccount');
+    _userCreditAccount.remove(updatedUserAccount);
+    updatedUserAccount.delete();
+  }
+
   Future<void> addTransaction({
     required CreditAccount existAccount,
     required Transactions newTransaction,

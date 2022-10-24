@@ -106,7 +106,7 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
       transactionList.add(
         Transactions(
           id: DateTime.now().toIso8601String(),
-          name: 'EditedBalance',
+          name: AppConfig.transactionEditedBalance,
           isIncome: true,
           balance: tranNewBalance,
         ),
@@ -190,7 +190,9 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
         children: <Widget>[
           SizedBox(height: dSize.height * 0.01),
           Text(
-            AppConfig.addCreditAccount,
+            mood == SheetMood.update
+                ? AppConfig.updateCreditAccount + widget.accountToEdit!.name
+                : AppConfig.addCreditAccount,
             style: Theme.of(context).textTheme.headlineLarge,
           ),
           SizedBox(height: dSize.height * 0.05),
@@ -213,7 +215,7 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
           ElevatedButton(
             onPressed:
                 mood == SheetMood.update ? _onUpdateAccount : _onAddAccount,
-            child: const Text(AppConfig.addAccount),
+            child: Text(AppConfig.updateCreditAccount + accNameController.text),
           )
         ],
       ),

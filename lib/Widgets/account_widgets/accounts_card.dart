@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/credit_account.dart';
+import 'package:masrufat/Providers/accounts_provider.dart';
 import 'package:masrufat/Screens/account_screen.dart';
+import 'package:masrufat/dialog/custom_generic_dialog.dart';
 import 'package:masrufat/helper/app_config.dart';
+import 'package:provider/provider.dart';
 
 import 'add_account_bottom_sheet.dart';
 
@@ -15,7 +18,77 @@ class CreditAccountCard extends StatefulWidget {
 }
 
 class _CreditAccountCardState extends State<CreditAccountCard> {
+  late AccountsProvider myProvider;
+  @override
+  void initState() {
+    myProvider = Provider.of<AccountsProvider>(context, listen: false);
+    super.initState();
+  }
+
   void _onRefresh() => setState(() {});
+  Future<bool?> _onDismiss() => customGenericDialog(
+        context: context,
+        title: AppConfig.dialogConfirmationTitle,
+        content: AppConfig.dialogConfirmationDelete,
+        dialogOptions: () => {
+          'no': false,
+          'yes': true,
+        },
+      );
+  void _showDialog({
+    required CreditAccount account,
+  }) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Select Option'),
+          children: <Widget>[
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.of(context).pop();
+                showModalBottomSheet<void>(
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom,
+                      ),
+                      child: AddAccountBottomSheet(
+                        accountToEdit: account,
+                        onRefresh: _onRefresh,
+                      ),
+                    );
+                  },
+                );
+              },
+              child: const Text('Edit'),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.of(context).pop();
+                customGenericDialog(
+                  context: context,
+                  title: AppConfig.dialogConfirmationTitle,
+                  content: AppConfig.dialogConfirmationDelete,
+                  dialogOptions: () => {
+                    'No': null,
+                    'Yes': () => myProvider.deleteCreditAccount(
+                          updatedUserAccount: account,
+                        ),
+                  },
+                );
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+    _onRefresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
@@ -28,21 +101,7 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
       itemBuilder: (context, index) => Padding(
         padding: const EdgeInsets.all(10.0),
         child: GestureDetector(
-          onLongPress: () => showModalBottomSheet<void>(
-            isScrollControlled: true,
-            context: context,
-            builder: (BuildContext context) {
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom,
-                ),
-                child: AddAccountBottomSheet(
-                  accountToEdit: widget.accounts[index],
-                  onRefresh: _onRefresh,
-                ),
-              );
-            },
-          ),
+          onLongPress: () => _showDialog(account: widget.accounts[index]),
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => AccountScreen(
@@ -51,20 +110,16 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
             ),
           ),
           child: Dismissible(
-            onDismissed: (direction) {
-              direction == DismissDirection.endToStart ? null : null;
+            direction: DismissDirection.endToStart,
+            confirmDismiss: (direction) => _onDismiss(),
+            onDismissed: (value) {
+              myProvider.deleteCreditAccount(
+                updatedUserAccount: widget.accounts[index],
+              );
+              _onRefresh();
             },
             key: Key(widget.accounts[index].id),
             background: Container(
-              padding: const EdgeInsets.all(20),
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(Icons.edit),
-            ),
-            secondaryBackground: Container(
               padding: const EdgeInsets.all(20),
               alignment: Alignment.centerRight,
               decoration: BoxDecoration(

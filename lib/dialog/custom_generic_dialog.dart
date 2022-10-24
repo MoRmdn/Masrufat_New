@@ -18,14 +18,8 @@ Future<T?> customGenericDialog<T>({
           actions: options.keys
               .map(
                 (optionTitle) => TextButton(
-                  onPressed: () {
-                    final value = options[optionTitle];
-                    if (value != null) {
-                      Navigator.of(context).pop(value);
-                    } else {
-                      Navigator.of(context).pop();
-                    }
-                  },
+                  onPressed:
+                      options[optionTitle] ?? () => Navigator.of(context).pop(),
                   child: Text(
                     optionTitle,
                   ),
