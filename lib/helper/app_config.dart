@@ -40,7 +40,9 @@ class AppConfig {
   static const accountRouteName = '/navigationScreen';
 
   static const addCreditAccount = 'Add Credit Account';
+  static const updateCreditAccount = 'Update Account :';
   static const addTransAction = 'Add Transaction';
+  static const updateTransAction = 'Update Transaction';
   static const accountName = 'Account Name';
   static const accountNameHint = 'Salary or CIB';
   static const accountDescription = 'Account Description';
@@ -54,11 +56,14 @@ class AppConfig {
   static const transactionNameHint = 'Transaction Description';
   static const transactionBalance = 'Transaction Balance';
   static const transactionBalanceHint = '500.00';
+  static const transactionEditedBalance = 'EditedBalance';
 
   //? Dialog error info
   static const dialogErrorTitle = 'Error';
   static const dialogErrorEmptyAccountName = 'Please, Enter Valid Data';
-
+  static const dialogConfirmationTitle = 'Confirmation';
+  static const dialogConfirmationDelete =
+      'are u sure you want to delete this account ?';
   static const dataBaseBoxName = 'myAccounts';
 
   //? assets

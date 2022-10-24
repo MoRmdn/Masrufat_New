@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:masrufat/Models/credit_account.dart';
 import 'package:masrufat/helper/app_config.dart';
 
-import '../Widgets/add_transaction_bottom_sheet.dart';
+import '../Widgets/transaction_widgets/add_transaction_bottom_sheet.dart';
+import '../Widgets/transaction_widgets/transaction_card.dart';
 
 class AccountScreen extends StatefulWidget {
   final CreditAccount account;
@@ -13,9 +14,9 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  void _onRefresh() {
-    setState(() {});
-  }
+  bool isExpanded = false;
+
+  void _onRefresh() => setState(() {});
 
   Widget accountInfo({
     required double hight,
@@ -56,7 +57,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).viewInsets.bottom,
                   ),
-                  child: TransactionBottomSheet(
+                  child: AddTransactionBottomSheet(
                     account: widget.account,
                     reFresh: _onRefresh,
                   ),
@@ -116,18 +117,9 @@ class _AccountScreenState extends State<AccountScreen> {
               Column(
                 children: widget.account.transactions
                     .map(
-                      (element) => Container(
-                        margin: const EdgeInsets.all(10),
-                        color: element.isIncome ? Colors.green : Colors.red,
-                        child: ListTile(
-                          title: Text(
-                            element.name,
-                          ),
-                          subtitle: Text(
-                            element.id,
-                          ),
-                          trailing: Text(element.balance.toString()),
-                        ),
+                      (element) => TransactionCard(
+                        trans: element,
+                        account: widget.account,
                       ),
                     )
                     .toList(),
