@@ -4,11 +4,13 @@ Widget kTextField({
   required TextEditingController controller,
   required String textFieldLabel,
   required String textFieldHint,
+  required TextInputType kType,
 }) =>
     Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextField(
         controller: controller,
+        keyboardType: kType,
         decoration: InputDecoration(
           label: Text(textFieldLabel),
           hintText: textFieldHint,

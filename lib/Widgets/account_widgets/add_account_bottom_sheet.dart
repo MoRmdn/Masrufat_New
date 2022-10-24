@@ -69,7 +69,9 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
         title: AppConfig.dialogErrorTitle,
         content: AppConfig.dialogErrorEmptyAccountName,
         dialogOptions: () {
-          return {AppConfig.ok: true};
+          return {
+            AppConfig.ok: null,
+          };
         },
       );
       Future.delayed(const Duration(milliseconds: 500))
@@ -142,7 +144,9 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
         title: AppConfig.dialogErrorTitle,
         content: AppConfig.dialogErrorEmptyAccountName,
         dialogOptions: () {
-          return {AppConfig.ok: true};
+          return {
+            AppConfig.ok: null,
+          };
         },
       );
       return;
@@ -200,16 +204,19 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
             controller: accNameController,
             textFieldHint: AppConfig.accountNameHint,
             textFieldLabel: AppConfig.accountName,
+            kType: TextInputType.name,
           ),
           kTextField(
             controller: descriptionController,
             textFieldHint: AppConfig.accountDescriptionHint,
             textFieldLabel: AppConfig.accountDescription,
+            kType: TextInputType.text,
           ),
           kTextField(
             controller: balanceController,
             textFieldHint: AppConfig.accountBalanceHint,
             textFieldLabel: AppConfig.accountBalance,
+            kType: TextInputType.number,
           ),
           SizedBox(height: dSize.height * 0.05),
           ElevatedButton(

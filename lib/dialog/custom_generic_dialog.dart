@@ -15,17 +15,17 @@ Future<T?> customGenericDialog<T>({
         return AlertDialog(
           title: Text(title),
           content: Text(content),
-          actions: options.keys
-              .map(
-                (optionTitle) => TextButton(
-                  onPressed:
-                      options[optionTitle] ?? () => Navigator.of(context).pop(),
-                  child: Text(
-                    optionTitle,
-                  ),
+          actions: options.keys.map(
+            (optionTitle) {
+              final option = options[optionTitle];
+              return TextButton(
+                onPressed: option ?? () => Navigator.of(context).pop(),
+                child: Text(
+                  optionTitle,
                 ),
-              )
-              .toList(),
+              );
+            },
+          ).toList(),
         );
       },
     );

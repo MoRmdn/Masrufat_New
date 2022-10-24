@@ -42,6 +42,7 @@ class AppConfig {
   static const addCreditAccount = 'Add Credit Account';
   static const updateCreditAccount = 'Update Account :';
   static const addTransAction = 'Add Transaction';
+  static const updateTransAction = 'Update Transaction';
   static const accountName = 'Account Name';
   static const accountNameHint = 'Salary or CIB';
   static const accountDescription = 'Account Description';

@@ -6,7 +6,7 @@ import 'package:masrufat/dialog/custom_generic_dialog.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import 'add_account_bottom_sheet.dart';
+import 'edit_delete_dialogs.dart';
 
 // ignore: must_be_immutable
 class CreditAccountCard extends StatefulWidget {
@@ -31,63 +31,10 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
         title: AppConfig.dialogConfirmationTitle,
         content: AppConfig.dialogConfirmationDelete,
         dialogOptions: () => {
-          'no': false,
-          'yes': true,
+          'no': null,
+          'yes': () => Navigator.of(context).pop(true),
         },
       );
-  void _showDialog({
-    required CreditAccount account,
-  }) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          title: const Text('Select Option'),
-          children: <Widget>[
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.of(context).pop();
-                showModalBottomSheet<void>(
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom,
-                      ),
-                      child: AddAccountBottomSheet(
-                        accountToEdit: account,
-                        onRefresh: _onRefresh,
-                      ),
-                    );
-                  },
-                );
-              },
-              child: const Text('Edit'),
-            ),
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.of(context).pop();
-                customGenericDialog(
-                  context: context,
-                  title: AppConfig.dialogConfirmationTitle,
-                  content: AppConfig.dialogConfirmationDelete,
-                  dialogOptions: () => {
-                    'No': null,
-                    'Yes': () => myProvider.deleteCreditAccount(
-                          updatedUserAccount: account,
-                        ),
-                  },
-                );
-              },
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
-    _onRefresh();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +48,12 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
       itemBuilder: (context, index) => Padding(
         padding: const EdgeInsets.all(10.0),
         child: GestureDetector(
-          onLongPress: () => _showDialog(account: widget.accounts[index]),
+          onLongPress: () => showCustomDialog(
+            context: context,
+            myProvider: myProvider,
+            onRefresh: _onRefresh,
+            account: widget.accounts[index],
+          ),
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => AccountScreen(
