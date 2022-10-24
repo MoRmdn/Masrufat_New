@@ -1,16 +1,15 @@
 import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/credit_account.dart';
-import 'package:masrufat/Widgets/accounts_card.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
 import '../Providers/accounts_provider.dart';
+import '../Widgets/account_widgets/accounts_card.dart';
 
 class NavigationScreen extends StatefulWidget {
   static const routName = AppConfig.navigationRouteName;
   final IconData iconData;
-
   int index;
 
   NavigationScreen({
