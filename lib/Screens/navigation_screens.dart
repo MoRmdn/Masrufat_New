@@ -1,7 +1,7 @@
 import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/credit_account.dart';
-import 'package:masrufat/Screens/accounts.dart';
+import 'package:masrufat/Widgets/accounts_card.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 

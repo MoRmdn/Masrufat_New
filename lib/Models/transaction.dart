@@ -7,7 +7,7 @@ class Transactions extends HiveObject {
   @HiveField(0)
   final String id;
   @HiveField(1)
-  final String date;
+  final double balance;
   @HiveField(2)
   final String name;
   @HiveField(3)
@@ -17,16 +17,16 @@ class Transactions extends HiveObject {
 
   Transactions({
     required this.id,
-    required this.date,
     required this.name,
     required this.isIncome,
+    required this.balance,
     this.transferTo,
   });
 
   factory Transactions.fromMap(Map map) {
     return Transactions(
+      balance: map['balance'],
       name: map['name'],
-      date: map['date'],
       isIncome: map['isIncome'],
       id: map['id'],
       transferTo: map['transferTo'],
@@ -34,8 +34,8 @@ class Transactions extends HiveObject {
   }
 
   Transactions.initial({
-    required this.date,
     required this.id,
+    required this.balance,
     this.name = 'initial Transaction',
     this.isIncome = true,
   });
@@ -43,8 +43,8 @@ class Transactions extends HiveObject {
   Map<String, dynamic> toMap() => {
         'id': id,
         'name': name,
-        'date': date,
         'isIncome': isIncome,
+        'balance': balance,
         'transferTo': transferTo,
       };
 
@@ -54,5 +54,6 @@ class Transactions extends HiveObject {
         'name': name,
         'isIncome': isIncome,
         'transferTo': transferTo,
+        'balance': balance,
       }.toString();
 }

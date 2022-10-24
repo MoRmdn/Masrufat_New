@@ -12,7 +12,7 @@ class CreditAccount extends HiveObject {
   @HiveField(2)
   final String description;
   @HiveField(3)
-  final double balance;
+  double balance;
   @HiveField(4)
   final List<Transactions> transactions;
   CreditAccount({

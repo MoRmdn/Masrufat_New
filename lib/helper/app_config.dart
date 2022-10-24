@@ -37,8 +37,10 @@ class AppConfig {
 
   static const homeRouteName = '/homeScreen';
   static const navigationRouteName = '/navigationScreen';
+  static const accountRouteName = '/navigationScreen';
 
   static const addCreditAccount = 'Add Credit Account';
+  static const addTransAction = 'Add Transaction';
   static const accountName = 'Account Name';
   static const accountNameHint = 'Salary or CIB';
   static const accountDescription = 'Account Description';
@@ -48,9 +50,14 @@ class AppConfig {
   static const addAccount = 'Add Account';
   static const account = 'My Accounts';
 
+  static const transactionName = 'Transaction Info ';
+  static const transactionNameHint = 'Transaction Description';
+  static const transactionBalance = 'Transaction Balance';
+  static const transactionBalanceHint = '500.00';
+
   //? Dialog error info
   static const dialogErrorTitle = 'Error';
-  static const dialogErrorEmptyAccountName = 'Please, Enter Valid Account Name';
+  static const dialogErrorEmptyAccountName = 'Please, Enter Valid Data';
 
   static const dataBaseBoxName = 'myAccounts';
 

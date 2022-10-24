@@ -1,15 +1,11 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:masrufat/Models/credit_account.dart';
-import 'package:masrufat/Models/transaction.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
-import 'package:masrufat/dialog/custom_generic_dialog.dart';
-import 'package:masrufat/dialog/loading_screen_dialog.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import '../Widgets/bottom_sheet.dart';
+import '../Widgets/add_account_bottom_sheet.dart';
 import 'navigation_screens.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,10 +18,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
-  final TextEditingController accNameController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController balanceController = TextEditingController();
-  final loading = LoadingScreen.instance();
   final autoSizeGroup = AutoSizeGroup();
   var _bottomNavIndex = 0; //default index of a first screen
 
@@ -75,11 +67,12 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
-    accNameController.dispose();
-    descriptionController.dispose();
-    balanceController.dispose();
     _animationController.dispose();
     super.dispose();
+  }
+
+  void _onRefresh() {
+    setState(() {});
   }
 
   Future<void> _askedToLead() async {
@@ -92,13 +85,19 @@ class _HomeScreenState extends State<HomeScreen>
             SimpleDialogOption(
               onPressed: () {
                 Navigator.of(context).pop();
-                addAccountBottomSheet(
+                showModalBottomSheet<void>(
+                  isScrollControlled: true,
                   context: context,
-                  onPress: onAddAccount,
-                  dSize: dSize,
-                  accNameController: accNameController,
-                  descriptionController: descriptionController,
-                  balanceController: balanceController,
+                  builder: (BuildContext context) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom,
+                      ),
+                      child: AddAccountBottomSheet(
+                        onRefresh: _onRefresh,
+                      ),
+                    );
+                  },
                 );
               },
               child: const Text('Credit Account'),
@@ -107,46 +106,6 @@ class _HomeScreenState extends State<HomeScreen>
         );
       },
     );
-  }
-
-  void onAddAccount() {
-    loading.show(context: context, content: AppConfig.pleaseWait);
-    Future.delayed(const Duration(milliseconds: 500))
-        .then((value) => loading.hide());
-    final name = accNameController.text;
-    final description = descriptionController.text;
-    final balance = balanceController.text;
-    if (name.isEmpty) {
-      customGenericDialog(
-        context: context,
-        title: AppConfig.dialogErrorTitle,
-        content: AppConfig.dialogErrorEmptyAccountName,
-        dialogOptions: () {
-          return {AppConfig.ok: true};
-        },
-      );
-      return;
-    }
-    final userCreditAccount = CreditAccount(
-      id: DateTime.now().toIso8601String(),
-      name: name,
-      description:
-          description.isEmpty ? AppConfig.accountDescriptionHint : description,
-      balance: double.parse(
-        balance.isEmpty ? AppConfig.accountBalanceHint : balance,
-      ),
-      transactions: [
-        Transactions.initial(
-          date: DateTime.now().toIso8601String(),
-          id: DateTime.now().toIso8601String(),
-        )
-      ],
-    );
-
-    myProvider.addCreditAccount(userAccount: userCreditAccount);
-
-    Navigator.of(context).pop();
-    setState(() {});
   }
 
   @override
