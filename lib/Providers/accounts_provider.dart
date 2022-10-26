@@ -16,7 +16,11 @@ class AccountsProvider with ChangeNotifier {
   final Box<CreditAccount> _dataBaseBox =
       Hive.box<CreditAccount>(AppConfig.dataBaseBoxName);
   List<CreditAccount> _userCreditAccount = [];
-
+  final List<Transactions> _expensesTransaction = [];
+  final List<Transactions> _expensesPerMonthTransaction = [];
+  double grandTotal = 0.0;
+  double _totalExpenses = 0.0;
+  double _totalPerMonthExpenses = 0.0;
   Future<void> fetchDataBaseBox() async {
     _userCreditAccount = _dataBaseBox.values.toList().cast<CreditAccount>();
     log(_userCreditAccount.toString());
@@ -101,6 +105,33 @@ class AccountsProvider with ChangeNotifier {
     _dataBaseBox.put(account.id, account);
   }
 
+  Future<void> userExpenses() async {
+    for (var element in _userCreditAccount) {
+      for (var element in element.transactions) {
+        if (element.isIncome == false) {
+          _totalExpenses += element.balance;
+          _expensesTransaction.add(element);
+          DateTime date = DateTime.parse(element.id);
+          //* check if this transaction happen this month or not
+          if (date.month == DateTime.now().month) {
+            _totalPerMonthExpenses += element.balance;
+            _expensesPerMonthTransaction.add(element);
+          }
+        }
+      }
+    }
+  }
+
+  Future<void> deleteDataBase() async {
+    _userCreditAccount = [];
+    _dataBaseBox.deleteFromDisk();
+  }
+
   Box<CreditAccount> get getCreditAccountsBox => _dataBaseBox;
   List<CreditAccount> get getUserCreditAccounts => _userCreditAccount;
+  List<Transactions> get getUserExpenses => _expensesTransaction;
+  List<Transactions> get getUserExpensesPerMonth =>
+      _expensesPerMonthTransaction;
+  double get getTotalExpenses => _totalExpenses;
+  double get getTotalPerMonthExpenses => _totalPerMonthExpenses;
 }
