@@ -6,7 +6,7 @@ import 'package:masrufat/Screens/home_screen/widgets/home_app_bar.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import '../account_screen/account_widgets/add_account_bottom_sheet.dart';
+import '../credit_account_screen/account_widgets/add_account_bottom_sheet.dart';
 import '../navigation_screens.dart';
 
 class HomeScreen extends StatefulWidget {

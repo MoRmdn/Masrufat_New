@@ -49,7 +49,7 @@ void showCustomDialog({
                 dialogOptions: () => {
                   'No': null,
                   'Yes': () => myProvider.deleteCreditAccount(
-                        updatedUserAccount: account!,
+                        deleteUserCreditAccount: account!,
                       ),
                 },
               );

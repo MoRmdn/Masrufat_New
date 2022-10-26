@@ -152,7 +152,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         balance: double.parse(transactionBalance),
       );
       myProvider.addTransaction(
-        existAccount: widget.account,
+        existCreditAccount: widget.account,
         newTransaction: newTrans,
       );
     } else {
@@ -163,7 +163,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         balance: -double.parse(transactionBalance),
       );
       myProvider.addTransaction(
-        existAccount: widget.account,
+        existCreditAccount: widget.account,
         newTransaction: newTrans,
       );
     }

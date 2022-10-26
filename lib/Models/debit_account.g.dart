@@ -1,24 +1,24 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'credit_account.dart';
+part of 'debit_account.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class CreditAccountAdapter extends TypeAdapter<CreditAccount> {
+class DebitAccountAdapter extends TypeAdapter<DebitAccount> {
   @override
-  final int typeId = 1;
+  final int typeId = 3;
 
   @override
-  CreditAccount read(BinaryReader reader) {
+  DebitAccount read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return CreditAccount(
-      transactions: (fields[4] as List).cast<Transactions>(),
+    return DebitAccount(
       id: fields[0] as String,
+      transactions: (fields[4] as List).cast<Transactions>(),
       name: fields[1] as String,
       description: fields[2] as String,
       balance: fields[3] as double,
@@ -26,7 +26,7 @@ class CreditAccountAdapter extends TypeAdapter<CreditAccount> {
   }
 
   @override
-  void write(BinaryWriter writer, CreditAccount obj) {
+  void write(BinaryWriter writer, DebitAccount obj) {
     writer
       ..writeByte(5)
       ..writeByte(0)
@@ -47,7 +47,7 @@ class CreditAccountAdapter extends TypeAdapter<CreditAccount> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CreditAccountAdapter &&
+      other is DebitAccountAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

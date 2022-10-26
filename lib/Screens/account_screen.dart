@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:masrufat/Models/credit_account.dart';
 import 'package:masrufat/helper/app_config.dart';
 
-import 'account_screen/transaction_widgets/add_transaction_bottom_sheet.dart';
-import 'account_screen/transaction_widgets/transaction_card.dart';
+import 'credit_account_screen/transaction_widgets/add_transaction_bottom_sheet.dart';
+import 'credit_account_screen/transaction_widgets/transaction_card.dart';
 
 class AccountScreen extends StatefulWidget {
   final CreditAccount account;

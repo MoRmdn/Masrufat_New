@@ -41,7 +41,7 @@ class _TransactionCardState extends State<TransactionCard> {
         'No': null,
         'Yes': () => myProvider.deleteTransaction(
               index: index,
-              account: widget.account,
+              creditAccount: widget.account,
             )
       },
     );

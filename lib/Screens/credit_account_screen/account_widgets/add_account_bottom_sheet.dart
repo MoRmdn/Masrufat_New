@@ -101,7 +101,7 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
         transactions: transactionList,
       );
       myProvider.updateCreditAccount(
-        updatedUserAccount: widget.accountToEdit!,
+        updatedUserCreditAccount: widget.accountToEdit!,
       );
     } else {
       final tranNewBalance = double.parse(balance) - oldBalance;
@@ -124,7 +124,7 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
         transactions: transactionList,
       );
       myProvider.updateCreditAccount(
-        updatedUserAccount: widget.accountToEdit!,
+        updatedUserCreditAccount: widget.accountToEdit!,
       );
     }
 
@@ -168,7 +168,7 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
       ],
     );
 
-    myProvider.addCreditAccount(userAccount: userCreditAccount);
+    myProvider.addAccount(userCreditAccount: userCreditAccount);
     widget.onRefresh();
     Future.delayed(const Duration(milliseconds: 500))
         .then((value) => loading.hide());

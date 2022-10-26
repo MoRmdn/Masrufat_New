@@ -77,7 +77,8 @@ class AppConfig {
       'are u sure you want to delete this account ?';
   static const dialogConfirmationDeleteDataBase =
       'are u sure you want to delete all Data on Application ? \nyou won\'t be able to retrieve it';
-  static const dataBaseBoxName = 'myAccounts';
+  static const dataBaseBoxForCredit = 'myAccounts';
+  static const dataBaseBoxForDebit = 'myDebitAccounts';
 
   //? assets
   static const loginBackgroundImage = 'assets/images/2.png';

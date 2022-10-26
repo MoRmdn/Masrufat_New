@@ -27,6 +27,7 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
   }
 
   void _onRefresh() => setState(() {});
+
   Future<bool?> _onDismiss() => customGenericDialog(
         context: context,
         title: AppConfig.dialogConfirmationTitle,
@@ -39,7 +40,7 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
 
   Future<void> getGrandBalance() =>
       Future.delayed(const Duration(milliseconds: 500))
-          .then((value) => grandBalance = myProvider.getGrandTotalBalance);
+          .then((value) => grandBalance = myProvider.getTotalCreditBalance);
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +107,7 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
                       confirmDismiss: (direction) => _onDismiss(),
                       onDismissed: (value) {
                         myProvider.deleteCreditAccount(
-                          updatedUserAccount: widget.accounts[index],
+                          deleteUserCreditAccount: widget.accounts[index],
                         );
                         _onRefresh();
                       },

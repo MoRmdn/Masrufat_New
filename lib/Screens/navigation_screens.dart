@@ -8,7 +8,7 @@ import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
 import '../Providers/accounts_provider.dart';
-import 'account_screen/account_widgets/accounts_card.dart';
+import 'credit_account_screen/account_widgets/accounts_card.dart';
 
 // ignore: must_be_immutable
 class NavigationScreen extends StatefulWidget {

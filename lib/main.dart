@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:masrufat/Models/credit_account.dart';
+import 'package:masrufat/Models/debit_account.dart';
 import 'package:masrufat/Models/transaction.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
@@ -14,9 +15,11 @@ Future<void> main() async {
   //? register multiple adapter
   Hive
     ..registerAdapter(CreditAccountAdapter())
-    ..registerAdapter(TransactionsAdapter());
+    ..registerAdapter(TransactionsAdapter())
+    ..registerAdapter(DebitAccountAdapter());
 
-  await Hive.openBox<CreditAccount>(AppConfig.dataBaseBoxName);
+  await Hive.openBox<CreditAccount>(AppConfig.dataBaseBoxForCredit);
+  await Hive.openBox<CreditAccount>(AppConfig.dataBaseBoxForDebit);
   runApp(
     const MyApp(),
   );
