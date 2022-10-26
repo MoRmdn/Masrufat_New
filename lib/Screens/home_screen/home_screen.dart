@@ -41,9 +41,11 @@ class _HomeScreenState extends State<HomeScreen>
     Future.delayed(
       const Duration(milliseconds: 500),
       () => myProvider.fetchDataBaseBox(),
-    ).then(
-      (value) => myProvider.userExpenses(),
-    );
+    )
+        .then(
+          (value) => myProvider.userTotalBlanca(),
+        )
+        .then((value) => myProvider.userExpenses());
 
     _animationController = AnimationController(
       duration: const Duration(seconds: 1),

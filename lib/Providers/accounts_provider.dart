@@ -21,6 +21,7 @@ class AccountsProvider with ChangeNotifier {
   double grandTotal = 0.0;
   double _totalExpenses = 0.0;
   double _totalPerMonthExpenses = 0.0;
+  double _grandTotalBalance = 0.0;
   Future<void> fetchDataBaseBox() async {
     _userCreditAccount = _dataBaseBox.values.toList().cast<CreditAccount>();
     log(_userCreditAccount.toString());
@@ -122,6 +123,13 @@ class AccountsProvider with ChangeNotifier {
     }
   }
 
+  Future<void> userTotalBlanca() async {
+    for (var element in _userCreditAccount) {
+      _grandTotalBalance += element.balance;
+    }
+    notifyListeners();
+  }
+
   Future<void> deleteDataBase() async {
     _userCreditAccount = [];
     _dataBaseBox.deleteFromDisk();
@@ -134,4 +142,5 @@ class AccountsProvider with ChangeNotifier {
       _expensesPerMonthTransaction;
   double get getTotalExpenses => _totalExpenses;
   double get getTotalPerMonthExpenses => _totalPerMonthExpenses;
+  double get getGrandTotalBalance => _grandTotalBalance;
 }

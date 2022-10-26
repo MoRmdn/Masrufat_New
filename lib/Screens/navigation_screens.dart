@@ -2,7 +2,7 @@ import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/credit_account.dart';
 import 'package:masrufat/Models/transaction.dart';
-import 'package:masrufat/Screens/expenses.dart';
+import 'package:masrufat/Screens/expenses/expenses.dart';
 import 'package:masrufat/Screens/settings_screen/settings.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';

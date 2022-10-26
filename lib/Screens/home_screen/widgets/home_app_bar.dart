@@ -35,10 +35,10 @@ AppBar getAppBar({
   } else if (bottomNavIndex == 1) {
     return AppBar(
       title: const Text(AppConfig.debit),
-      actions: [
+      actions: const [
         IconButton(
-          onPressed: () => askToLoad(),
-          icon: const Icon(Icons.add),
+          onPressed: null,
+          icon: Icon(Icons.add),
         ),
       ],
     );

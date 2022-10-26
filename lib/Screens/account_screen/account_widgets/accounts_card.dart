@@ -19,6 +19,7 @@ class CreditAccountCard extends StatefulWidget {
 
 class _CreditAccountCardState extends State<CreditAccountCard> {
   late AccountsProvider myProvider;
+  double grandBalance = 0.0;
   @override
   void initState() {
     myProvider = Provider.of<AccountsProvider>(context, listen: false);
@@ -36,83 +37,128 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
         },
       );
 
+  Future<void> getGrandBalance() =>
+      Future.delayed(const Duration(milliseconds: 500))
+          .then((value) => grandBalance = myProvider.getGrandTotalBalance);
+
   @override
   Widget build(BuildContext context) {
+    getGrandBalance();
     final orientation = MediaQuery.of(context).orientation;
-    return GridView.builder(
-      itemCount: widget.accounts.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: orientation == Orientation.portrait ? 1 : 2,
-        childAspectRatio: 3,
-      ),
-      itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: GestureDetector(
-          onLongPress: () => showCustomDialog(
-            context: context,
-            myProvider: myProvider,
-            onRefresh: _onRefresh,
-            account: widget.accounts[index],
-          ),
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => AccountScreen(
-                account: widget.accounts[index],
-              ),
-            ),
-          ),
-          child: Dismissible(
-            direction: DismissDirection.endToStart,
-            confirmDismiss: (direction) => _onDismiss(),
-            onDismissed: (value) {
-              myProvider.deleteCreditAccount(
-                updatedUserAccount: widget.accounts[index],
-              );
-              _onRefresh();
-            },
-            key: Key(widget.accounts[index].id),
-            background: Container(
-              padding: const EdgeInsets.all(20),
-              alignment: Alignment.centerRight,
-              decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(Icons.delete),
-            ),
-            child: GridTile(
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppConfig.cardColorList[index],
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Center(
-                  child: Text(
-                    widget.accounts[index].name,
-                    style: Theme.of(context).textTheme.displayLarge,
-                  ),
-                ),
-              ),
-              footer: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.black12,
-                  borderRadius:
-                      BorderRadius.vertical(bottom: Radius.circular(20)),
-                ),
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.1,
+              child: Card(
+                elevation: 6,
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(AppConfig.accountBalance),
-                      const Spacer(),
-                      Text(widget.accounts[index].balance.toString()),
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          'Total Blanca',
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          '$grandBalance \$',
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
             ),
-          ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height,
+              child: GridView.builder(
+                itemCount: widget.accounts.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: orientation == Orientation.portrait ? 1 : 2,
+                  childAspectRatio: 3,
+                ),
+                itemBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: GestureDetector(
+                    onLongPress: () => showCustomDialog(
+                      context: context,
+                      myProvider: myProvider,
+                      onRefresh: _onRefresh,
+                      account: widget.accounts[index],
+                    ),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => AccountScreen(
+                          account: widget.accounts[index],
+                        ),
+                      ),
+                    ),
+                    child: Dismissible(
+                      direction: DismissDirection.endToStart,
+                      confirmDismiss: (direction) => _onDismiss(),
+                      onDismissed: (value) {
+                        myProvider.deleteCreditAccount(
+                          updatedUserAccount: widget.accounts[index],
+                        );
+                        _onRefresh();
+                      },
+                      key: Key(widget.accounts[index].id),
+                      background: Container(
+                        padding: const EdgeInsets.all(20),
+                        alignment: Alignment.centerRight,
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Icon(Icons.delete),
+                      ),
+                      child: GridTile(
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppConfig.cardColorList[index],
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              widget.accounts[index].name,
+                              style: Theme.of(context).textTheme.displayLarge,
+                            ),
+                          ),
+                        ),
+                        footer: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.black12,
+                            borderRadius: BorderRadius.vertical(
+                              bottom: Radius.circular(20),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Row(
+                              children: [
+                                const Text(AppConfig.accountBalance),
+                                const Spacer(),
+                                Text(widget.accounts[index].balance.toString()),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

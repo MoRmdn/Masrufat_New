@@ -28,8 +28,19 @@ class Expenses extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('This Month Expenses'),
-                    Text('$totalExpensesThisMonth \$'),
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        'This Month Expenses',
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '$totalExpensesThisMonth \$',
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -39,15 +50,20 @@ class Expenses extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: expensesThisMonth
                 .map(
-                  (trans) => ListTile(
-                    title: Text(
-                      trans.name,
-                    ),
-                    subtitle: Text(
-                      trans.id,
-                    ),
-                    leading: Text(
-                      trans.balance.toString(),
+                  (trans) => Container(
+                    margin: const EdgeInsets.all(10),
+                    color: Colors.red,
+                    child: ListTile(
+                      textColor: Colors.white,
+                      title: Text(
+                        trans.name,
+                      ),
+                      subtitle: Text(
+                        trans.id,
+                      ),
+                      leading: Text(
+                        trans.balance.toString(),
+                      ),
                     ),
                   ),
                 )
