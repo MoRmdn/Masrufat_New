@@ -62,7 +62,7 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          'Total Blanca',
+                          AppConfig.totalBalance,
                           style: Theme.of(context).textTheme.headline6,
                         ),
                       ),
