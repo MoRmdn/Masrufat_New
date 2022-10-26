@@ -6,8 +6,8 @@ import 'package:masrufat/dialog/custom_generic_dialog.dart';
 import 'package:masrufat/dialog/loading_screen_dialog.dart';
 import 'package:provider/provider.dart';
 
-import '../../helper/app_config.dart';
-import '../custom_text_field.dart';
+import '../../../Widgets/custom_text_field.dart';
+import '../../../helper/app_config.dart';
 
 enum TansMood {
   add,

@@ -1,11 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
 
-import '../../Models/credit_account.dart';
-import '../../dialog/custom_generic_dialog.dart';
-import '../../helper/app_config.dart';
+import '../../../Models/credit_account.dart';
+import '../../../dialog/custom_generic_dialog.dart';
+import '../../../helper/app_config.dart';
 import 'add_account_bottom_sheet.dart';
 
 void showCustomDialog({
@@ -14,7 +12,6 @@ void showCustomDialog({
   required VoidCallback onRefresh,
   CreditAccount? account,
 }) {
-  log('test');
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -64,5 +61,4 @@ void showCustomDialog({
     },
   );
   onRefresh();
-  Navigator.of(context).pop();
 }

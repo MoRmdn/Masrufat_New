@@ -50,7 +50,17 @@ class AppConfig {
   static const accountBalance = 'Account Balance';
   static const accountBalanceHint = '500.00';
   static const addAccount = 'Add Account';
-  static const account = 'My Accounts';
+  static const myAccount = 'My Accounts';
+  static const account = 'Credit';
+  static const debit = 'Debit';
+  static const expenses = 'Expenses';
+
+  static const deleteDataBase = 'Delete All Accounts';
+  static const settings = 'Settings';
+  static const rateUs = 'Rate Us';
+  static const share = 'Share';
+  static const support = 'Support';
+  static const termsAndConditions = 'Terms and Conditions';
 
   static const transactionName = 'Transaction Info ';
   static const transactionNameHint = 'Transaction Description';
@@ -64,6 +74,8 @@ class AppConfig {
   static const dialogConfirmationTitle = 'Confirmation';
   static const dialogConfirmationDelete =
       'are u sure you want to delete this account ?';
+  static const dialogConfirmationDeleteDataBase =
+      'are u sure you want to delete all Data on Application ? \nyou won\'t be able to retrieve it again';
   static const dataBaseBoxName = 'myAccounts';
 
   //? assets

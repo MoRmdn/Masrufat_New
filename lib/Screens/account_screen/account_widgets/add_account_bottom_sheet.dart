@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../Models/credit_account.dart';
-import '../../Models/transaction.dart';
-import '../../Providers/accounts_provider.dart';
-import '../../dialog/custom_generic_dialog.dart';
-import '../../dialog/loading_screen_dialog.dart';
-import '../../helper/app_config.dart';
-import '../custom_text_field.dart';
+import '../../../Models/credit_account.dart';
+import '../../../Models/transaction.dart';
+import '../../../Providers/accounts_provider.dart';
+import '../../../Widgets/custom_text_field.dart';
+import '../../../dialog/custom_generic_dialog.dart';
+import '../../../dialog/loading_screen_dialog.dart';
+import '../../../helper/app_config.dart';
 
 enum SheetMood {
   add,
   update,
 }
 
+// ignore: must_be_immutable
 class AddAccountBottomSheet extends StatefulWidget {
   final VoidCallback onRefresh;
   CreditAccount? accountToEdit;
@@ -222,7 +223,11 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
           ElevatedButton(
             onPressed:
                 mood == SheetMood.update ? _onUpdateAccount : _onAddAccount,
-            child: Text(AppConfig.updateCreditAccount + accNameController.text),
+            child: Text(
+              mood == SheetMood.update
+                  ? AppConfig.updateCreditAccount
+                  : AppConfig.addCreditAccount + accNameController.text,
+            ),
           )
         ],
       ),

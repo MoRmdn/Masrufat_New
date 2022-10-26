@@ -6,7 +6,7 @@ import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
 import '../Providers/accounts_provider.dart';
-import 'Screens/home_screen.dart';
+import 'Screens/home_screen/home_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
