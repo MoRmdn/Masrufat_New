@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:masrufat/Models/credit_account.dart';
+import 'package:masrufat/Models/debit_account.dart';
 import 'package:masrufat/Models/transaction.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
 import 'package:masrufat/dialog/custom_generic_dialog.dart';
@@ -15,12 +15,12 @@ enum TansMood {
 }
 
 // ignore: must_be_immutable
-class AddTransactionBottomSheet extends StatefulWidget {
-  final CreditAccount account;
+class AddDebitTransactionBottomSheet extends StatefulWidget {
+  final DebitAccount account;
   VoidCallback reFresh;
   final int? transIndex;
   final bool? isUpdate;
-  AddTransactionBottomSheet({
+  AddDebitTransactionBottomSheet({
     Key? key,
     required this.account,
     required this.reFresh,
@@ -29,11 +29,12 @@ class AddTransactionBottomSheet extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<AddTransactionBottomSheet> createState() =>
-      _AddTransactionBottomSheetState();
+  State<AddDebitTransactionBottomSheet> createState() =>
+      _AddDebitTransactionBottomSheetState();
 }
 
-class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
+class _AddDebitTransactionBottomSheetState
+    extends State<AddDebitTransactionBottomSheet> {
   final transactionNameController = TextEditingController();
   final balanceController = TextEditingController();
   String timeAsID = DateTime.now().toIso8601String();
@@ -101,8 +102,9 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         balance: double.parse(balance),
       );
       myProvider.updateTransaction(
-        existAccount: widget.account,
+        debitAccount: widget.account,
         newTransaction: newTrans,
+        creditAccount: null,
       );
     } else {
       final newTrans = Transactions(
@@ -112,8 +114,9 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         balance: -double.parse(balance),
       );
       myProvider.updateTransaction(
-        existAccount: widget.account,
+        debitAccount: widget.account,
         newTransaction: newTrans,
+        creditAccount: null,
       );
     }
 
@@ -152,8 +155,9 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         balance: double.parse(transactionBalance),
       );
       myProvider.addTransaction(
-        existCreditAccount: widget.account,
+        existDebitAccount: widget.account,
         newTransaction: newTrans,
+        existCreditAccount: null,
       );
     } else {
       final newTrans = Transactions(
@@ -163,8 +167,9 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         balance: -double.parse(transactionBalance),
       );
       myProvider.addTransaction(
-        existCreditAccount: widget.account,
+        existDebitAccount: widget.account,
         newTransaction: newTrans,
+        existCreditAccount: null,
       );
     }
 

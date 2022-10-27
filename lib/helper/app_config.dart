@@ -40,7 +40,8 @@ class AppConfig {
   static const accountRouteName = '/navigationScreen';
 
   static const addCreditAccount = 'Add Credit Account';
-  static const updateCreditAccount = 'Update Account :';
+  static const addDebitAccount = 'Add Debit Account';
+  static const updateAccount = 'Update Account :';
   static const addTransAction = 'Add Transaction';
   static const updateTransAction = 'Update Transaction';
   static const accountName = 'Account Name';
@@ -55,6 +56,7 @@ class AppConfig {
   static const debit = 'Debit';
   static const expenses = 'Expenses';
   static const totalBalance = 'Total Balance';
+  static const grandTotalBalance = 'Grand Total Balance';
 
   static const deleteDataBase = 'Delete All Accounts';
   static const settings = 'Settings';

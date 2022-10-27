@@ -32,8 +32,16 @@ class AccountsProvider with ChangeNotifier {
   Future<void> fetchDataBaseBox() async {
     _userCreditAccounts =
         _dataBaseBoxForCredit.values.toList().cast<CreditAccount>();
+    for (var element in _userCreditAccounts) {
+      _totalCreditBalance += element.balance;
+    }
     _userDebitAccounts =
         _dataBaseBoxForDebit.values.toList().cast<DebitAccount>();
+    for (var element in _userDebitAccounts) {
+      _totalDebitBalance += element.balance;
+    }
+    _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
+    _userExpenses();
     log('this is your Credit Accounts $_userCreditAccounts');
     log('this is your Debit Accounts $_userDebitAccounts');
     notifyListeners();
@@ -57,7 +65,7 @@ class AccountsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateCreditAccount({
+  Future<void> updateAccount({
     required CreditAccount? updatedUserCreditAccount,
     required DebitAccount? updatedUserDebitAccount,
   }) async {
@@ -93,7 +101,7 @@ class AccountsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> deleteCreditAccount({
+  Future<void> deleteAccount({
     required CreditAccount? deleteUserCreditAccount,
     required DebitAccount? deleteUserDebitAccount,
   }) async {
@@ -106,6 +114,7 @@ class AccountsProvider with ChangeNotifier {
       deleteUserDebitAccount.delete();
       log('deleteDebitAccount');
     }
+    notifyListeners();
   }
 
   Future<void> addTransaction({
@@ -127,22 +136,36 @@ class AccountsProvider with ChangeNotifier {
       existDebitAccount.balance += newTransaction.balance;
       _dataBaseBoxForDebit.put(existDebitAccount.id, existDebitAccount);
     }
+    notifyListeners();
   }
 
   Future<void> updateTransaction({
-    required CreditAccount existAccount,
+    required CreditAccount? creditAccount,
+    required DebitAccount? debitAccount,
     required Transactions newTransaction,
   }) async {
-    final index = existAccount.transactions
-        .indexWhere((element) => element.id == newTransaction.id);
-    //? this is the old transaction
-    final oldTransaction = existAccount.transactions[index];
-    existAccount.balance -= oldTransaction.balance;
-    ////
-    existAccount.balance += newTransaction.balance;
-    existAccount.transactions[index] = newTransaction;
-    //? save New Updated Account to DataBase
-    _dataBaseBoxForCredit.put(existAccount.id, existAccount);
+    if (creditAccount != null) {
+      final index = creditAccount.transactions
+          .indexWhere((element) => element.id == newTransaction.id);
+      //? this is the old transaction
+      final oldTransaction = creditAccount.transactions[index];
+      creditAccount.balance -= oldTransaction.balance;
+      creditAccount.balance += newTransaction.balance;
+      creditAccount.transactions[index] = newTransaction;
+      //? save New Updated Account to DataBase
+      _dataBaseBoxForCredit.put(creditAccount.id, creditAccount);
+    } else if (debitAccount != null) {
+      final index = debitAccount.transactions
+          .indexWhere((element) => element.id == newTransaction.id);
+      //? this is the old transaction
+      final oldTransaction = debitAccount.transactions[index];
+      debitAccount.balance -= oldTransaction.balance;
+      debitAccount.balance += newTransaction.balance;
+      debitAccount.transactions[index] = newTransaction;
+      //? save New Updated Account to DataBase
+      _dataBaseBoxForDebit.put(debitAccount.id, debitAccount);
+    }
+    notifyListeners();
   }
 
   Future<void> deleteTransaction({
@@ -174,9 +197,10 @@ class AccountsProvider with ChangeNotifier {
       _dataBaseBoxForDebit.put(debitAccount.id, debitAccount);
     }
     log('deleted Account');
+    notifyListeners();
   }
 
-  Future<void> userExpenses() async {
+  Future<void> _userExpenses() async {
     for (var element in _userCreditAccounts) {
       for (var element in element.transactions) {
         if (element.isIncome == false) {
@@ -191,26 +215,18 @@ class AccountsProvider with ChangeNotifier {
         }
       }
     }
-  }
-
-  Future<void> userTotalBlanca() async {
-    for (var element in _userCreditAccounts) {
-      _totalCreditBalance += element.balance;
-    }
-    for (var element in _userDebitAccounts) {
-      _totalDebitBalance += element.balance;
-    }
-    _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
     notifyListeners();
   }
 
   Future<void> deleteDataBase() async {
     _userCreditAccounts = [];
     _dataBaseBoxForCredit.deleteFromDisk();
+    notifyListeners();
   }
 
   Box<CreditAccount> get getCreditAccountsBox => _dataBaseBoxForCredit;
   List<CreditAccount> get getUserCreditAccounts => _userCreditAccounts;
+  List<DebitAccount> get getUserDebitAccounts => _userDebitAccounts;
   List<Transactions> get getUserExpenses => _expensesTransaction;
   List<Transactions> get getUserExpensesPerMonth =>
       _expensesPerMonthTransaction;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:masrufat/Models/credit_account.dart';
+import 'package:masrufat/Models/debit_account.dart';
 import 'package:masrufat/Models/transaction.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
 import 'package:masrufat/dialog/custom_generic_dialog.dart';
@@ -8,20 +8,20 @@ import 'package:provider/provider.dart';
 
 import 'add_transaction_bottom_sheet.dart';
 
-class TransactionCard extends StatefulWidget {
-  final CreditAccount account;
+class DebitTransactionCard extends StatefulWidget {
+  final DebitAccount account;
   final Transactions trans;
-  const TransactionCard({
+  const DebitTransactionCard({
     Key? key,
     required this.trans,
     required this.account,
   }) : super(key: key);
 
   @override
-  State<TransactionCard> createState() => _TransactionCardState();
+  State<DebitTransactionCard> createState() => _DebitTransactionCardState();
 }
 
-class _TransactionCardState extends State<TransactionCard> {
+class _DebitTransactionCardState extends State<DebitTransactionCard> {
   bool isExpanded = false;
   late AccountsProvider myProvider;
   @override
@@ -41,7 +41,8 @@ class _TransactionCardState extends State<TransactionCard> {
         'No': null,
         'Yes': () => myProvider.deleteTransaction(
               index: index,
-              creditAccount: widget.account,
+              debitAccount: widget.account,
+              creditAccount: null,
             )
       },
     );
@@ -106,7 +107,7 @@ class _TransactionCardState extends State<TransactionCard> {
                         padding: EdgeInsets.only(
                           bottom: MediaQuery.of(context).viewInsets.bottom,
                         ),
-                        child: AddTransactionBottomSheet(
+                        child: AddDebitTransactionBottomSheet(
                           transIndex: index,
                           isUpdate: true,
                           account: account,

@@ -6,7 +6,8 @@ import 'package:masrufat/Screens/home_screen/widgets/home_app_bar.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import '../credit_account_screen/account_widgets/add_account_bottom_sheet.dart';
+import '../credit_account_screen/account_widgets/add_credit_account_bottom_sheet.dart';
+import '../debit_account_screen/account_widgets/add_account_bottom_sheet.dart';
 import '../navigation_screens.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -41,11 +42,7 @@ class _HomeScreenState extends State<HomeScreen>
     Future.delayed(
       const Duration(milliseconds: 500),
       () => myProvider.fetchDataBaseBox(),
-    )
-        .then(
-          (value) => myProvider.userTotalBlanca(),
-        )
-        .then((value) => myProvider.userExpenses());
+    );
 
     _animationController = AnimationController(
       duration: const Duration(seconds: 1),
@@ -78,11 +75,7 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
-  void _onRefresh() {
-    setState(() {
-      _bottomNavIndex = 0;
-    });
-  }
+  void _onRefresh() => setState(() {});
 
   Future<void> _askedToLoad() async {
     await showDialog(
@@ -102,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen>
                       padding: EdgeInsets.only(
                         bottom: MediaQuery.of(context).viewInsets.bottom,
                       ),
-                      child: AddAccountBottomSheet(
+                      child: AddCreditAccountBottomSheet(
                         onRefresh: _onRefresh,
                       ),
                     );
@@ -110,6 +103,26 @@ class _HomeScreenState extends State<HomeScreen>
                 );
               },
               child: const Text('Credit Account'),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.of(context).pop();
+                showModalBottomSheet<void>(
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom,
+                      ),
+                      child: AddDebitAccountBottomSheet(
+                        onRefresh: _onRefresh,
+                      ),
+                    );
+                  },
+                );
+              },
+              child: const Text('Debit Account'),
             ),
           ],
         );

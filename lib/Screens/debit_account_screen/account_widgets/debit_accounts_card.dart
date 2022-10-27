@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:masrufat/Models/credit_account.dart';
+import 'package:masrufat/Models/debit_account.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
-import 'package:masrufat/Screens/account_screen.dart';
 import 'package:masrufat/dialog/custom_generic_dialog.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import 'edit_delete_dialogs.dart';
+import '../../../Widgets/edit_delete_dialogs.dart';
+import '../../debit_account_screen.dart';
 
 // ignore: must_be_immutable
-class CreditAccountCard extends StatefulWidget {
-  List<CreditAccount> accounts;
-  CreditAccountCard({Key? key, required this.accounts}) : super(key: key);
+class DebitAccountCard extends StatefulWidget {
+  List<DebitAccount> accounts;
+  double totalDebitBalance;
+  DebitAccountCard({
+    Key? key,
+    required this.accounts,
+    required this.totalDebitBalance,
+  }) : super(key: key);
 
   @override
-  State<CreditAccountCard> createState() => _CreditAccountCardState();
+  State<DebitAccountCard> createState() => _DebitAccountCardState();
 }
 
-class _CreditAccountCardState extends State<CreditAccountCard> {
+class _DebitAccountCardState extends State<DebitAccountCard> {
   late AccountsProvider myProvider;
-  double grandBalance = 0.0;
+
   @override
   void initState() {
     myProvider = Provider.of<AccountsProvider>(context, listen: false);
@@ -37,14 +42,8 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
           'yes': () => Navigator.of(context).pop(true),
         },
       );
-
-  Future<void> getGrandBalance() =>
-      Future.delayed(const Duration(milliseconds: 500))
-          .then((value) => grandBalance = myProvider.getTotalCreditBalance);
-
   @override
   Widget build(BuildContext context) {
-    getGrandBalance();
     final orientation = MediaQuery.of(context).orientation;
     return SizedBox(
       height: MediaQuery.of(context).size.height,
@@ -69,7 +68,7 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
                       ),
                       Expanded(
                         child: Text(
-                          '$grandBalance \$',
+                          '${widget.totalDebitBalance} \$',
                           style: Theme.of(context).textTheme.headline6,
                         ),
                       ),
@@ -93,11 +92,11 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
                       context: context,
                       myProvider: myProvider,
                       onRefresh: _onRefresh,
-                      account: widget.accounts[index],
+                      debitAccount: widget.accounts[index],
                     ),
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => AccountScreen(
+                        builder: (_) => DebitAccountScreen(
                           account: widget.accounts[index],
                         ),
                       ),
@@ -106,8 +105,9 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
                       direction: DismissDirection.endToStart,
                       confirmDismiss: (direction) => _onDismiss(),
                       onDismissed: (value) {
-                        myProvider.deleteCreditAccount(
-                          deleteUserCreditAccount: widget.accounts[index],
+                        myProvider.deleteAccount(
+                          deleteUserCreditAccount: null,
+                          deleteUserDebitAccount: widget.accounts[index],
                         );
                         _onRefresh();
                       },

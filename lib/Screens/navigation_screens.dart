@@ -1,6 +1,7 @@
 import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/credit_account.dart';
+import 'package:masrufat/Models/debit_account.dart';
 import 'package:masrufat/Models/transaction.dart';
 import 'package:masrufat/Screens/expenses/expenses.dart';
 import 'package:masrufat/Screens/settings_screen/settings.dart';
@@ -8,7 +9,8 @@ import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
 import '../Providers/accounts_provider.dart';
-import 'credit_account_screen/account_widgets/accounts_card.dart';
+import 'credit_account_screen/account_widgets/credit_accounts_card.dart';
+import 'debit_account_screen/account_widgets/debit_accounts_card.dart';
 
 // ignore: must_be_immutable
 class NavigationScreen extends StatefulWidget {
@@ -29,11 +31,15 @@ class NavigationScreen extends StatefulWidget {
 class _NavigationScreenState extends State<NavigationScreen>
     with TickerProviderStateMixin {
   late AccountsProvider myProvider;
-  List<CreditAccount> accounts = [];
+  List<CreditAccount> creditAccount = [];
+  List<DebitAccount> debitAccount = [];
   List<Transactions> expensesThisMonth = [];
   List<Transactions> expenses = [];
   double totalExpenses = 0.0;
   double totalExpensesThisMonth = 0.0;
+  double totalCreditBalance = 0.0;
+  double totalDebitBalance = 0.0;
+  double grandTotalBalance = 0.0;
   late AnimationController _controller;
   late Animation<double> animation;
 
@@ -80,48 +86,59 @@ class _NavigationScreenState extends State<NavigationScreen>
 
   Future<void> fetchData() async {
     Future.delayed(const Duration(microseconds: 500)).then((value) {
-      accounts = myProvider.getUserCreditAccounts;
+      creditAccount = myProvider.getUserCreditAccounts;
+      debitAccount = myProvider.getUserDebitAccounts;
       expensesThisMonth = myProvider.getUserExpensesPerMonth;
       expenses = myProvider.getUserExpenses;
       totalExpenses = myProvider.getTotalExpenses;
       totalExpensesThisMonth = myProvider.getTotalPerMonthExpenses;
+      totalCreditBalance = myProvider.getTotalCreditBalance;
+      totalDebitBalance = myProvider.getTotalDebitBalance;
+      grandTotalBalance = myProvider.getTotalGrandBalance;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     fetchData();
-    return accounts.isNotEmpty && widget.index == 0
+    return creditAccount.isNotEmpty && widget.index == 0
         ? CreditAccountCard(
-            accounts: accounts,
+            accounts: creditAccount,
+            grandTotalBalance: grandTotalBalance,
+            totalCreditBalance: totalCreditBalance,
           )
-        : widget.index == 2 && expenses.isNotEmpty
-            ? Expenses(
-                expenses: expenses,
-                expensesThisMonth: expensesThisMonth,
-                totalExpenses: totalExpenses,
-                totalExpensesThisMonth: totalExpensesThisMonth,
+        : debitAccount.isNotEmpty && widget.index == 1
+            ? DebitAccountCard(
+                accounts: debitAccount,
+                totalDebitBalance: totalDebitBalance,
               )
-            : widget.index == 3
-                ? const Settings()
-                : Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    color: Colors.white,
-                    child: Center(
-                      child: CircularRevealAnimation(
-                        animation: animation,
-                        centerOffset: const Offset(80, 80),
-                        maxRadius:
-                            MediaQuery.of(context).size.longestSide * 1.1,
-                        child: Icon(
-                          widget.iconData,
-                          color: HexColor('#FFA400'),
-                          size: 160,
+            : widget.index == 2 && expenses.isNotEmpty
+                ? Expenses(
+                    expenses: expenses,
+                    expensesThisMonth: expensesThisMonth,
+                    totalExpenses: totalExpenses,
+                    totalExpensesThisMonth: totalExpensesThisMonth,
+                  )
+                : widget.index == 3
+                    ? const Settings()
+                    : Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        color: Colors.white,
+                        child: Center(
+                          child: CircularRevealAnimation(
+                            animation: animation,
+                            centerOffset: const Offset(80, 80),
+                            maxRadius:
+                                MediaQuery.of(context).size.longestSide * 1.1,
+                            child: Icon(
+                              widget.iconData,
+                              color: HexColor('#FFA400'),
+                              size: 160,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  );
+                      );
   }
 }
 

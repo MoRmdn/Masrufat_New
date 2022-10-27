@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/credit_account.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
-import 'package:masrufat/Screens/account_screen.dart';
+import 'package:masrufat/Screens/credit_account_screen.dart';
 import 'package:masrufat/dialog/custom_generic_dialog.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import 'edit_delete_dialogs.dart';
+import '../../../Widgets/edit_delete_dialogs.dart';
 
 // ignore: must_be_immutable
 class CreditAccountCard extends StatefulWidget {
   List<CreditAccount> accounts;
-  CreditAccountCard({Key? key, required this.accounts}) : super(key: key);
+  double totalCreditBalance;
+  double grandTotalBalance;
+  CreditAccountCard({
+    Key? key,
+    required this.accounts,
+    required this.totalCreditBalance,
+    required this.grandTotalBalance,
+  }) : super(key: key);
 
   @override
   State<CreditAccountCard> createState() => _CreditAccountCardState();
@@ -19,7 +26,7 @@ class CreditAccountCard extends StatefulWidget {
 
 class _CreditAccountCardState extends State<CreditAccountCard> {
   late AccountsProvider myProvider;
-  double grandBalance = 0.0;
+
   @override
   void initState() {
     myProvider = Provider.of<AccountsProvider>(context, listen: false);
@@ -38,13 +45,8 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
         },
       );
 
-  Future<void> getGrandBalance() =>
-      Future.delayed(const Duration(milliseconds: 500))
-          .then((value) => grandBalance = myProvider.getTotalCreditBalance);
-
   @override
   Widget build(BuildContext context) {
-    getGrandBalance();
     final orientation = MediaQuery.of(context).orientation;
     return SizedBox(
       height: MediaQuery.of(context).size.height,
@@ -57,21 +59,47 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
                 elevation: 6,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          AppConfig.totalBalance,
-                          style: Theme.of(context).textTheme.headline6,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              AppConfig.grandTotalBalance,
+                              style: Theme.of(context).textTheme.headline6,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Consumer<AccountsProvider>(
+                              builder: (_, value, ch) => Text(
+                                '${value.getTotalGrandBalance} \$',
+                                style: Theme.of(context).textTheme.headline6,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: Text(
-                          '$grandBalance \$',
-                          style: Theme.of(context).textTheme.headline6,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              AppConfig.totalBalance,
+                              style: Theme.of(context).textTheme.headline6,
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              '${widget.totalCreditBalance} \$',
+                              style: Theme.of(context).textTheme.headline6,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -93,11 +121,11 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
                       context: context,
                       myProvider: myProvider,
                       onRefresh: _onRefresh,
-                      account: widget.accounts[index],
+                      creditAccount: widget.accounts[index],
                     ),
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => AccountScreen(
+                        builder: (_) => CreditAccountScreen(
                           account: widget.accounts[index],
                         ),
                       ),
@@ -106,8 +134,9 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
                       direction: DismissDirection.endToStart,
                       confirmDismiss: (direction) => _onDismiss(),
                       onDismissed: (value) {
-                        myProvider.deleteCreditAccount(
+                        myProvider.deleteAccount(
                           deleteUserCreditAccount: widget.accounts[index],
+                          deleteUserDebitAccount: null,
                         );
                         _onRefresh();
                       },

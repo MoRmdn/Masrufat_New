@@ -15,20 +15,23 @@ enum SheetMood {
 }
 
 // ignore: must_be_immutable
-class AddAccountBottomSheet extends StatefulWidget {
+class AddCreditAccountBottomSheet extends StatefulWidget {
   final VoidCallback onRefresh;
   CreditAccount? accountToEdit;
-  AddAccountBottomSheet({
+
+  AddCreditAccountBottomSheet({
     Key? key,
     required this.onRefresh,
     this.accountToEdit,
   }) : super(key: key);
 
   @override
-  State<AddAccountBottomSheet> createState() => _AddAccountBottomSheetState();
+  State<AddCreditAccountBottomSheet> createState() =>
+      _AddCreditAccountBottomSheetState();
 }
 
-class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
+class _AddCreditAccountBottomSheetState
+    extends State<AddCreditAccountBottomSheet> {
   final TextEditingController accNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController balanceController = TextEditingController();
@@ -100,8 +103,9 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
         ),
         transactions: transactionList,
       );
-      myProvider.updateCreditAccount(
+      myProvider.updateAccount(
         updatedUserCreditAccount: widget.accountToEdit!,
+        updatedUserDebitAccount: null,
       );
     } else {
       final tranNewBalance = double.parse(balance) - oldBalance;
@@ -123,8 +127,9 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
         ),
         transactions: transactionList,
       );
-      myProvider.updateCreditAccount(
+      myProvider.updateAccount(
         updatedUserCreditAccount: widget.accountToEdit!,
+        updatedUserDebitAccount: null,
       );
     }
 
@@ -168,7 +173,10 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
       ],
     );
 
-    myProvider.addAccount(userCreditAccount: userCreditAccount);
+    myProvider.addAccount(
+      userCreditAccount: userCreditAccount,
+      userDebitAccount: null,
+    );
     widget.onRefresh();
     Future.delayed(const Duration(milliseconds: 500))
         .then((value) => loading.hide());
@@ -196,7 +204,7 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
           SizedBox(height: dSize.height * 0.01),
           Text(
             mood == SheetMood.update
-                ? AppConfig.updateCreditAccount + widget.accountToEdit!.name
+                ? AppConfig.updateAccount + widget.accountToEdit!.name
                 : AppConfig.addCreditAccount,
             style: Theme.of(context).textTheme.headlineLarge,
           ),
@@ -225,7 +233,7 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
                 mood == SheetMood.update ? _onUpdateAccount : _onAddAccount,
             child: Text(
               mood == SheetMood.update
-                  ? AppConfig.updateCreditAccount
+                  ? AppConfig.updateAccount
                   : AppConfig.addCreditAccount + accNameController.text,
             ),
           )

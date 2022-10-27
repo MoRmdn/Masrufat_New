@@ -19,7 +19,7 @@ Future<void> main() async {
     ..registerAdapter(DebitAccountAdapter());
 
   await Hive.openBox<CreditAccount>(AppConfig.dataBaseBoxForCredit);
-  await Hive.openBox<CreditAccount>(AppConfig.dataBaseBoxForDebit);
+  await Hive.openBox<DebitAccount>(AppConfig.dataBaseBoxForDebit);
   runApp(
     const MyApp(),
   );

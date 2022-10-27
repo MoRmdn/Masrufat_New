@@ -15,12 +15,12 @@ enum TansMood {
 }
 
 // ignore: must_be_immutable
-class AddTransactionBottomSheet extends StatefulWidget {
+class AddCreditTransactionBottomSheet extends StatefulWidget {
   final CreditAccount account;
   VoidCallback reFresh;
   final int? transIndex;
   final bool? isUpdate;
-  AddTransactionBottomSheet({
+  AddCreditTransactionBottomSheet({
     Key? key,
     required this.account,
     required this.reFresh,
@@ -29,11 +29,12 @@ class AddTransactionBottomSheet extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<AddTransactionBottomSheet> createState() =>
-      _AddTransactionBottomSheetState();
+  State<AddCreditTransactionBottomSheet> createState() =>
+      _AddCreditTransactionBottomSheetState();
 }
 
-class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
+class _AddCreditTransactionBottomSheetState
+    extends State<AddCreditTransactionBottomSheet> {
   final transactionNameController = TextEditingController();
   final balanceController = TextEditingController();
   String timeAsID = DateTime.now().toIso8601String();
@@ -101,8 +102,9 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         balance: double.parse(balance),
       );
       myProvider.updateTransaction(
-        existAccount: widget.account,
         newTransaction: newTrans,
+        creditAccount: widget.account,
+        debitAccount: null,
       );
     } else {
       final newTrans = Transactions(
@@ -112,8 +114,9 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         balance: -double.parse(balance),
       );
       myProvider.updateTransaction(
-        existAccount: widget.account,
+        creditAccount: widget.account,
         newTransaction: newTrans,
+        debitAccount: null,
       );
     }
 
@@ -154,6 +157,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
       myProvider.addTransaction(
         existCreditAccount: widget.account,
         newTransaction: newTrans,
+        existDebitAccount: null,
       );
     } else {
       final newTrans = Transactions(
@@ -165,6 +169,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
       myProvider.addTransaction(
         existCreditAccount: widget.account,
         newTransaction: newTrans,
+        existDebitAccount: null,
       );
     }
 

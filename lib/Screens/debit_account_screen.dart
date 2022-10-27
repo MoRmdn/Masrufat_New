@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:masrufat/Models/credit_account.dart';
+import 'package:masrufat/Models/debit_account.dart';
 import 'package:masrufat/helper/app_config.dart';
 
-import 'credit_account_screen/transaction_widgets/add_transaction_bottom_sheet.dart';
-import 'credit_account_screen/transaction_widgets/transaction_card.dart';
+import 'debit_account_screen/transaction_widgets/add_transaction_bottom_sheet.dart';
+import 'debit_account_screen/transaction_widgets/transaction_card.dart';
 
-class AccountScreen extends StatefulWidget {
-  final CreditAccount account;
-  const AccountScreen({Key? key, required this.account}) : super(key: key);
+class DebitAccountScreen extends StatefulWidget {
+  final DebitAccount account;
+  const DebitAccountScreen({Key? key, required this.account}) : super(key: key);
 
   @override
-  State<AccountScreen> createState() => _AccountScreenState();
+  State<DebitAccountScreen> createState() => _DebitAccountScreenState();
 }
 
-class _AccountScreenState extends State<AccountScreen> {
+class _DebitAccountScreenState extends State<DebitAccountScreen> {
   bool isExpanded = false;
 
   void _onRefresh() => setState(() {});
@@ -57,7 +57,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).viewInsets.bottom,
                   ),
-                  child: AddTransactionBottomSheet(
+                  child: AddDebitTransactionBottomSheet(
                     account: widget.account,
                     reFresh: _onRefresh,
                   ),
@@ -117,7 +117,7 @@ class _AccountScreenState extends State<AccountScreen> {
               Column(
                 children: widget.account.transactions
                     .map(
-                      (element) => TransactionCard(
+                      (element) => DebitTransactionCard(
                         trans: element,
                         account: widget.account,
                       ),
