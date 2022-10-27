@@ -40,7 +40,8 @@ class AppConfig {
   static const accountRouteName = '/navigationScreen';
 
   static const addCreditAccount = 'Add Credit Account';
-  static const updateCreditAccount = 'Update Account :';
+  static const addDebitAccount = 'Add Debit Account';
+  static const updateAccount = 'Update Account :';
   static const addTransAction = 'Add Transaction';
   static const updateTransAction = 'Update Transaction';
   static const accountName = 'Account Name';
@@ -50,7 +51,19 @@ class AppConfig {
   static const accountBalance = 'Account Balance';
   static const accountBalanceHint = '500.00';
   static const addAccount = 'Add Account';
-  static const account = 'My Accounts';
+  static const myAccount = 'My Accounts';
+  static const account = 'Credit';
+  static const debit = 'Debit';
+  static const expenses = 'Expenses';
+  static const totalBalance = 'Total Balance';
+  static const grandTotalBalance = 'Grand Total Balance';
+
+  static const deleteDataBase = 'Delete All Accounts';
+  static const settings = 'Settings';
+  static const rateUs = 'Rate Us';
+  static const share = 'Share';
+  static const support = 'Support';
+  static const termsAndConditions = 'Terms and Conditions';
 
   static const transactionName = 'Transaction Info ';
   static const transactionNameHint = 'Transaction Description';
@@ -64,7 +77,10 @@ class AppConfig {
   static const dialogConfirmationTitle = 'Confirmation';
   static const dialogConfirmationDelete =
       'are u sure you want to delete this account ?';
-  static const dataBaseBoxName = 'myAccounts';
+  static const dialogConfirmationDeleteDataBase =
+      'are u sure you want to delete all Data on Application ? \nyou won\'t be able to retrieve it';
+  static const dataBaseBoxForCredit = 'myAccounts';
+  static const dataBaseBoxForDebit = 'myDebitAccounts';
 
   //? assets
   static const loginBackgroundImage = 'assets/images/2.png';

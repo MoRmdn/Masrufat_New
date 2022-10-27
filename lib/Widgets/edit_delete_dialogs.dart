@@ -1,20 +1,20 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:masrufat/Models/debit_account.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
 
-import '../../Models/credit_account.dart';
-import '../../dialog/custom_generic_dialog.dart';
-import '../../helper/app_config.dart';
-import 'add_account_bottom_sheet.dart';
+import '../Models/credit_account.dart';
+import '../Screens/credit_account_screen/account_widgets/add_credit_account_bottom_sheet.dart';
+import '../Screens/debit_account_screen/account_widgets/add_account_bottom_sheet.dart';
+import '../dialog/custom_generic_dialog.dart';
+import '../helper/app_config.dart';
 
 void showCustomDialog({
   required BuildContext context,
   required AccountsProvider myProvider,
   required VoidCallback onRefresh,
-  CreditAccount? account,
+  CreditAccount? creditAccount,
+  DebitAccount? debitAccount,
 }) {
-  log('test');
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -32,10 +32,15 @@ void showCustomDialog({
                     padding: EdgeInsets.only(
                       bottom: MediaQuery.of(context).viewInsets.bottom,
                     ),
-                    child: AddAccountBottomSheet(
-                      accountToEdit: account,
-                      onRefresh: onRefresh,
-                    ),
+                    child: debitAccount == null
+                        ? AddCreditAccountBottomSheet(
+                            accountToEdit: creditAccount,
+                            onRefresh: onRefresh,
+                          )
+                        : AddDebitAccountBottomSheet(
+                            accountToEdit: debitAccount,
+                            onRefresh: onRefresh,
+                          ),
                   );
                 },
               );
@@ -51,9 +56,16 @@ void showCustomDialog({
                 content: AppConfig.dialogConfirmationDelete,
                 dialogOptions: () => {
                   'No': null,
-                  'Yes': () => myProvider.deleteCreditAccount(
-                        updatedUserAccount: account!,
-                      ),
+                  'Yes': () => myProvider
+                          .deleteAccount(
+                        deleteUserCreditAccount: creditAccount,
+                        deleteUserDebitAccount: debitAccount,
+                      )
+                          .then((value) {
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
+                        onRefresh();
+                      })
                 },
               );
             },
@@ -64,5 +76,4 @@ void showCustomDialog({
     },
   );
   onRefresh();
-  Navigator.of(context).pop();
 }

@@ -1,33 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../Models/credit_account.dart';
-import '../../Models/transaction.dart';
-import '../../Providers/accounts_provider.dart';
-import '../../dialog/custom_generic_dialog.dart';
-import '../../dialog/loading_screen_dialog.dart';
-import '../../helper/app_config.dart';
-import '../custom_text_field.dart';
+import '../../../Models/credit_account.dart';
+import '../../../Models/transaction.dart';
+import '../../../Providers/accounts_provider.dart';
+import '../../../Widgets/custom_text_field.dart';
+import '../../../dialog/custom_generic_dialog.dart';
+import '../../../dialog/loading_screen_dialog.dart';
+import '../../../helper/app_config.dart';
 
 enum SheetMood {
   add,
   update,
 }
 
-class AddAccountBottomSheet extends StatefulWidget {
+// ignore: must_be_immutable
+class AddCreditAccountBottomSheet extends StatefulWidget {
   final VoidCallback onRefresh;
   CreditAccount? accountToEdit;
-  AddAccountBottomSheet({
+
+  AddCreditAccountBottomSheet({
     Key? key,
     required this.onRefresh,
     this.accountToEdit,
   }) : super(key: key);
 
   @override
-  State<AddAccountBottomSheet> createState() => _AddAccountBottomSheetState();
+  State<AddCreditAccountBottomSheet> createState() =>
+      _AddCreditAccountBottomSheetState();
 }
 
-class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
+class _AddCreditAccountBottomSheetState
+    extends State<AddCreditAccountBottomSheet> {
   final TextEditingController accNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController balanceController = TextEditingController();
@@ -99,8 +103,9 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
         ),
         transactions: transactionList,
       );
-      myProvider.updateCreditAccount(
-        updatedUserAccount: widget.accountToEdit!,
+      myProvider.updateAccount(
+        updatedUserCreditAccount: widget.accountToEdit!,
+        updatedUserDebitAccount: null,
       );
     } else {
       final tranNewBalance = double.parse(balance) - oldBalance;
@@ -122,8 +127,9 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
         ),
         transactions: transactionList,
       );
-      myProvider.updateCreditAccount(
-        updatedUserAccount: widget.accountToEdit!,
+      myProvider.updateAccount(
+        updatedUserCreditAccount: widget.accountToEdit!,
+        updatedUserDebitAccount: null,
       );
     }
 
@@ -167,7 +173,10 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
       ],
     );
 
-    myProvider.addCreditAccount(userAccount: userCreditAccount);
+    myProvider.addAccount(
+      userCreditAccount: userCreditAccount,
+      userDebitAccount: null,
+    );
     widget.onRefresh();
     Future.delayed(const Duration(milliseconds: 500))
         .then((value) => loading.hide());
@@ -195,7 +204,7 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
           SizedBox(height: dSize.height * 0.01),
           Text(
             mood == SheetMood.update
-                ? AppConfig.updateCreditAccount + widget.accountToEdit!.name
+                ? AppConfig.updateAccount + widget.accountToEdit!.name
                 : AppConfig.addCreditAccount,
             style: Theme.of(context).textTheme.headlineLarge,
           ),
@@ -222,7 +231,11 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
           ElevatedButton(
             onPressed:
                 mood == SheetMood.update ? _onUpdateAccount : _onAddAccount,
-            child: Text(AppConfig.updateCreditAccount + accNameController.text),
+            child: Text(
+              mood == SheetMood.update
+                  ? AppConfig.updateAccount
+                  : AppConfig.addCreditAccount + accNameController.text,
+            ),
           )
         ],
       ),

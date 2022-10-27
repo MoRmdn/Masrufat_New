@@ -2,11 +2,13 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
+import 'package:masrufat/Screens/home_screen/widgets/home_app_bar.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import '../Widgets/account_widgets/add_account_bottom_sheet.dart';
-import 'navigation_screens.dart';
+import '../credit_account_screen/account_widgets/add_credit_account_bottom_sheet.dart';
+import '../debit_account_screen/account_widgets/add_account_bottom_sheet.dart';
+import '../navigation_screens.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = AppConfig.homeRouteName;
@@ -28,8 +30,10 @@ class _HomeScreenState extends State<HomeScreen>
   late AccountsProvider myProvider;
 
   final iconList = <IconData>[
+    Icons.account_balance_rounded,
     Icons.account_balance_wallet_outlined,
     Icons.money,
+    Icons.settings,
   ];
 
   @override
@@ -71,11 +75,9 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
-  void _onRefresh() {
-    setState(() {});
-  }
+  void _onRefresh() => setState(() {});
 
-  Future<void> _askedToLead() async {
+  Future<void> _askedToLoad() async {
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -93,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen>
                       padding: EdgeInsets.only(
                         bottom: MediaQuery.of(context).viewInsets.bottom,
                       ),
-                      child: AddAccountBottomSheet(
+                      child: AddCreditAccountBottomSheet(
                         onRefresh: _onRefresh,
                       ),
                     );
@@ -101,6 +103,26 @@ class _HomeScreenState extends State<HomeScreen>
                 );
               },
               child: const Text('Credit Account'),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.of(context).pop();
+                showModalBottomSheet<void>(
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom,
+                      ),
+                      child: AddDebitAccountBottomSheet(
+                        onRefresh: _onRefresh,
+                      ),
+                    );
+                  },
+                );
+              },
+              child: const Text('Debit Account'),
             ),
           ],
         );
@@ -112,14 +134,11 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     dSize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppConfig.account),
-        actions: [
-          IconButton(
-            onPressed: () => _askedToLead(),
-            icon: const Icon(Icons.add),
-          ),
-        ],
+      appBar: getAppBar(
+        context: context,
+        bottomNavIndex: _bottomNavIndex,
+        onRefresh: _onRefresh,
+        askToLoad: _askedToLoad,
       ),
       body: NavigationScreen(
         index: _bottomNavIndex,
@@ -137,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen>
           onPressed: () {
             _animationController.reset();
             _animationController.forward();
-            _askedToLead();
+            _askedToLoad();
           },
         ),
       ),
@@ -160,17 +179,32 @@ class _HomeScreenState extends State<HomeScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: index == 0
                     ? AutoSizeText(
-                        'Accounts',
+                        AppConfig.account,
                         maxLines: 1,
+                        minFontSize: 8,
                         style: TextStyle(color: color),
                         group: autoSizeGroup,
                       )
-                    : AutoSizeText(
-                        'Expenses',
-                        maxLines: 1,
-                        style: TextStyle(color: color),
-                        group: autoSizeGroup,
-                      ),
+                    : index == 1
+                        ? AutoSizeText(
+                            AppConfig.debit,
+                            maxLines: 1,
+                            style: TextStyle(color: color),
+                            group: autoSizeGroup,
+                          )
+                        : index == 2
+                            ? AutoSizeText(
+                                AppConfig.expenses,
+                                maxLines: 1,
+                                style: TextStyle(color: color),
+                                group: autoSizeGroup,
+                              )
+                            : AutoSizeText(
+                                AppConfig.settings,
+                                maxLines: 1,
+                                style: TextStyle(color: color),
+                                group: autoSizeGroup,
+                              ),
               )
             ],
           );
