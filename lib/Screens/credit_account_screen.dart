@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/credit_account.dart';
 import 'package:masrufat/helper/app_config.dart';
@@ -7,8 +9,12 @@ import 'credit_account_screen/transaction_widgets/credit_transaction_card.dart';
 
 class CreditAccountScreen extends StatefulWidget {
   final CreditAccount account;
-  const CreditAccountScreen({Key? key, required this.account})
-      : super(key: key);
+  final VoidCallback onRefresh;
+  const CreditAccountScreen({
+    Key? key,
+    required this.account,
+    required this.onRefresh,
+  }) : super(key: key);
 
   @override
   State<CreditAccountScreen> createState() => _CreditAccountScreenState();
@@ -44,6 +50,7 @@ class _CreditAccountScreenState extends State<CreditAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    log('CreditAccountScreen');
     final dSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -121,6 +128,10 @@ class _CreditAccountScreenState extends State<CreditAccountScreen> {
                       (element) => CreditTransactionCard(
                         trans: element,
                         account: widget.account,
+                        onRefresh: () {
+                          widget.onRefresh();
+                          _onRefresh();
+                        },
                       ),
                     )
                     .toList(),

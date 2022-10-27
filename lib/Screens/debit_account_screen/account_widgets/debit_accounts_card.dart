@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/debit_account.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
@@ -11,11 +13,10 @@ import '../../debit_account_screen.dart';
 // ignore: must_be_immutable
 class DebitAccountCard extends StatefulWidget {
   List<DebitAccount> accounts;
-  double totalDebitBalance;
+
   DebitAccountCard({
     Key? key,
     required this.accounts,
-    required this.totalDebitBalance,
   }) : super(key: key);
 
   @override
@@ -44,6 +45,7 @@ class _DebitAccountCardState extends State<DebitAccountCard> {
       );
   @override
   Widget build(BuildContext context) {
+    log('debitAccount');
     final orientation = MediaQuery.of(context).orientation;
     return SizedBox(
       height: MediaQuery.of(context).size.height,
@@ -56,23 +58,25 @@ class _DebitAccountCardState extends State<DebitAccountCard> {
                 elevation: 6,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          AppConfig.totalBalance,
-                          style: Theme.of(context).textTheme.headline6,
+                  child: Consumer<AccountsProvider>(
+                    builder: (_, snapShot, child) => Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            AppConfig.totalBalance,
+                            style: Theme.of(context).textTheme.headline6,
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          '${widget.totalDebitBalance} \$',
-                          style: Theme.of(context).textTheme.headline6,
+                        Expanded(
+                          child: Text(
+                            '${snapShot.getTotalDebitBalance} \$',
+                            style: Theme.of(context).textTheme.headline6,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -89,7 +93,7 @@ class _DebitAccountCardState extends State<DebitAccountCard> {
                   padding: const EdgeInsets.all(10.0),
                   child: GestureDetector(
                     onLongPress: () => showCustomDialog(
-                      context: context,
+                      ctx: context,
                       myProvider: myProvider,
                       onRefresh: _onRefresh,
                       debitAccount: widget.accounts[index],
@@ -98,6 +102,7 @@ class _DebitAccountCardState extends State<DebitAccountCard> {
                       MaterialPageRoute(
                         builder: (_) => DebitAccountScreen(
                           account: widget.accounts[index],
+                          onRefresh: _onRefresh,
                         ),
                       ),
                     ),

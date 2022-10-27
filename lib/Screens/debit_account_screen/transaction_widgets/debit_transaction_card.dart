@@ -11,10 +11,12 @@ import 'add_transaction_bottom_sheet.dart';
 class DebitTransactionCard extends StatefulWidget {
   final DebitAccount account;
   final Transactions trans;
+  final VoidCallback onRefresh;
   const DebitTransactionCard({
     Key? key,
     required this.trans,
     required this.account,
+    required this.onRefresh,
   }) : super(key: key);
 
   @override
@@ -32,18 +34,24 @@ class _DebitTransactionCardState extends State<DebitTransactionCard> {
 
   void _onRefresh() => setState(() {});
 
-  void _onDeleteTransaction(BuildContext ctx, int index) {
+  void _onDeleteTransaction(int index) {
     customGenericDialog(
-      context: ctx,
+      context: context,
       title: AppConfig.dialogConfirmationTitle,
       content: AppConfig.dialogConfirmationDelete,
       dialogOptions: () => {
         'No': null,
-        'Yes': () => myProvider.deleteTransaction(
-              index: index,
-              debitAccount: widget.account,
-              creditAccount: null,
-            )
+        'Yes': () => myProvider
+                .deleteTransaction(
+                  index: index,
+                  debitAccount: widget.account,
+                  creditAccount: null,
+                )
+                .then((value) => Navigator.of(context).pop())
+                .then((value) {
+              widget.onRefresh();
+              _onRefresh();
+            })
       },
     );
     _onRefresh();
@@ -127,7 +135,7 @@ class _DebitTransactionCardState extends State<DebitTransactionCard> {
               ),
               Expanded(
                 child: TextButton(
-                  onPressed: () => _onDeleteTransaction(context, index),
+                  onPressed: () => _onDeleteTransaction(index),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: const [

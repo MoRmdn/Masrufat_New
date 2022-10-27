@@ -1,13 +1,20 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/debit_account.dart';
 import 'package:masrufat/helper/app_config.dart';
 
 import 'debit_account_screen/transaction_widgets/add_transaction_bottom_sheet.dart';
-import 'debit_account_screen/transaction_widgets/transaction_card.dart';
+import 'debit_account_screen/transaction_widgets/debit_transaction_card.dart';
 
 class DebitAccountScreen extends StatefulWidget {
   final DebitAccount account;
-  const DebitAccountScreen({Key? key, required this.account}) : super(key: key);
+  final VoidCallback onRefresh;
+  const DebitAccountScreen({
+    Key? key,
+    required this.account,
+    required this.onRefresh,
+  }) : super(key: key);
 
   @override
   State<DebitAccountScreen> createState() => _DebitAccountScreenState();
@@ -43,6 +50,7 @@ class _DebitAccountScreenState extends State<DebitAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    log('DebitAccountScreen');
     final dSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -120,6 +128,10 @@ class _DebitAccountScreenState extends State<DebitAccountScreen> {
                       (element) => DebitTransactionCard(
                         trans: element,
                         account: widget.account,
+                        onRefresh: () {
+                          widget.onRefresh();
+                          _onRefresh();
+                        },
                       ),
                     )
                     .toList(),

@@ -15,8 +15,14 @@ class Settings extends StatelessWidget {
         context: context,
         title: AppConfig.dialogConfirmationTitle,
         content: AppConfig.dialogConfirmationDeleteDataBase,
-        dialogOptions: () =>
-            {'No': null, 'Yes': () => myProvider.deleteDataBase()},
+        dialogOptions: () => {
+          'No': null,
+          'Yes': () {
+            myProvider
+                .deleteDataBase()
+                .then((value) => Navigator.of(context).pop());
+          }
+        },
       );
 
   @override

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/credit_account.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
@@ -10,14 +12,11 @@ import '../../../Widgets/edit_delete_dialogs.dart';
 
 // ignore: must_be_immutable
 class CreditAccountCard extends StatefulWidget {
-  List<CreditAccount> accounts;
-  double totalCreditBalance;
-  double grandTotalBalance;
-  CreditAccountCard({
+  final List<CreditAccount> accounts;
+
+  const CreditAccountCard({
     Key? key,
     required this.accounts,
-    required this.totalCreditBalance,
-    required this.grandTotalBalance,
   }) : super(key: key);
 
   @override
@@ -47,6 +46,7 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
 
   @override
   Widget build(BuildContext context) {
+    log('Balance Rebuild ');
     final orientation = MediaQuery.of(context).orientation;
     return SizedBox(
       height: MediaQuery.of(context).size.height,
@@ -59,49 +59,48 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
                 elevation: 6,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: Text(
-                              AppConfig.grandTotalBalance,
-                              style: Theme.of(context).textTheme.headline6,
-                            ),
-                          ),
-                          Expanded(
-                            flex: 3,
-                            child: Consumer<AccountsProvider>(
-                              builder: (_, value, ch) => Text(
-                                '${value.getTotalGrandBalance} \$',
+                  child: Consumer<AccountsProvider>(
+                    builder: (_, snapShot, child) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: Text(
+                                AppConfig.grandTotalBalance,
                                 style: Theme.of(context).textTheme.headline6,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: Text(
-                              AppConfig.totalBalance,
-                              style: Theme.of(context).textTheme.headline6,
+                            Expanded(
+                              child: Text(
+                                '${snapShot.getTotalGrandBalance} \$',
+                                style: Theme.of(context).textTheme.headline6,
+                              ),
                             ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              '${widget.totalCreditBalance} \$',
-                              style: Theme.of(context).textTheme.headline6,
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: Text(
+                                AppConfig.totalBalance,
+                                style: Theme.of(context).textTheme.headline6,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            Expanded(
+                              child: Text(
+                                '${snapShot.getTotalCreditBalance} \$',
+                                style: Theme.of(context).textTheme.headline6,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -118,7 +117,7 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
                   padding: const EdgeInsets.all(10.0),
                   child: GestureDetector(
                     onLongPress: () => showCustomDialog(
-                      context: context,
+                      ctx: context,
                       myProvider: myProvider,
                       onRefresh: _onRefresh,
                       creditAccount: widget.accounts[index],
@@ -127,6 +126,7 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
                       MaterialPageRoute(
                         builder: (_) => CreditAccountScreen(
                           account: widget.accounts[index],
+                          onRefresh: _onRefresh,
                         ),
                       ),
                     ),
