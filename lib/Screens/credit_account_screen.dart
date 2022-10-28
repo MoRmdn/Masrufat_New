@@ -46,13 +46,17 @@ class _CreditAccountScreenState extends State<CreditAccountScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style: style,
+            Expanded(
+              child: Text(
+                title,
+                style: style,
+              ),
             ),
-            Text(
-              value,
-              style: style,
+            Expanded(
+              child: Text(
+                value,
+                style: style,
+              ),
             )
           ],
         ),
