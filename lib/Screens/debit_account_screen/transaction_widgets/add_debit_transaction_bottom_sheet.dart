@@ -39,7 +39,7 @@ class _AddDebitTransactionBottomSheetState
   final balanceController = TextEditingController();
   String timeAsID = DateTime.now().toIso8601String();
   late AccountsProvider myProvider;
-  bool switchValue = false;
+  bool switchValue = true;
   TansMood mood = TansMood.add;
   final loading = LoadingScreen.instance();
 

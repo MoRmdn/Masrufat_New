@@ -6,7 +6,7 @@ import 'package:masrufat/dialog/custom_generic_dialog.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import 'add_transaction_bottom_sheet.dart';
+import 'add_debit_transaction_bottom_sheet.dart';
 
 class DebitTransactionCard extends StatefulWidget {
   final DebitAccount account;

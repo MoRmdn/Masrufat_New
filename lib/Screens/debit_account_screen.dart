@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:masrufat/Models/debit_account.dart';
 import 'package:masrufat/helper/app_config.dart';
 
-import 'debit_account_screen/transaction_widgets/add_transaction_bottom_sheet.dart';
+import 'debit_account_screen/transaction_widgets/add_debit_transaction_bottom_sheet.dart';
 import 'debit_account_screen/transaction_widgets/debit_transaction_card.dart';
 
 class DebitAccountScreen extends StatefulWidget {

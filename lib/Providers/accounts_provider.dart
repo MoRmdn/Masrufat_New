@@ -153,14 +153,17 @@ class AccountsProvider with ChangeNotifier {
 
       //? add transactionBalance to total balance of the account
       existCreditAccount.balance += newTransaction.balance;
+      _totalCreditBalance += newTransaction.balance;
 
       //? save New Updated Account to DataBase
       _dataBaseBoxForCredit.put(existCreditAccount.id, existCreditAccount);
     } else if (existDebitAccount != null) {
       existDebitAccount.transactions.add(newTransaction);
       existDebitAccount.balance += newTransaction.balance;
+      _totalDebitBalance += newTransaction.balance;
       _dataBaseBoxForDebit.put(existDebitAccount.id, existDebitAccount);
     }
+    _grandTotalBalance = _totalCreditBalance + _totalDebitBalance;
     notifyListeners();
   }
 
@@ -257,10 +260,20 @@ class AccountsProvider with ChangeNotifier {
   }
 
   Future<void> deleteDataBase() async {
+    _grandTotalBalance = 0.0;
+    _totalCreditBalance = 0.0;
+    _totalDebitBalance = 0.0;
+    _totalExpenses = 0.0;
+    _totalPerMonthExpenses = 0.0;
+    _expensesTransaction.clear();
+    _expensesPerMonthTransaction.clear();
     _userCreditAccounts = [];
     _userDebitAccounts = [];
     _dataBaseBoxForCredit.deleteFromDisk();
     _dataBaseBoxForDebit.deleteFromDisk();
+
+    //? debit + credit Balance
+
     notifyListeners();
   }
 

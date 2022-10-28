@@ -18,7 +18,6 @@ enum SheetMood {
 class AddCreditAccountBottomSheet extends StatefulWidget {
   final VoidCallback onRefresh;
   CreditAccount? accountToEdit;
-
   AddCreditAccountBottomSheet({
     Key? key,
     required this.onRefresh,
