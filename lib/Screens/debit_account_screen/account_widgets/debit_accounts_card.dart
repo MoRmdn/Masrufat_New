@@ -90,7 +90,7 @@ class _DebitAccountCardState extends State<DebitAccountCard> {
                 itemCount: widget.accounts.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: orientation == Orientation.portrait ? 1 : 2,
-                  childAspectRatio: 3,
+                  childAspectRatio: 2.5,
                 ),
                 itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.all(10.0),

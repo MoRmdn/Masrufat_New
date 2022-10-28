@@ -32,8 +32,9 @@ class AddCreditAccountBottomSheet extends StatefulWidget {
 class _AddCreditAccountBottomSheetState
     extends State<AddCreditAccountBottomSheet> {
   final TextEditingController accNameController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
   final TextEditingController balanceController = TextEditingController();
+  final descriptionController = TextEditingController();
+
   SheetMood mood = SheetMood.add;
   final loading = LoadingScreen.instance();
   late Size dSize;
@@ -57,14 +58,13 @@ class _AddCreditAccountBottomSheetState
 
   void _updateMode() => setState(() {
         accNameController.text = widget.accountToEdit!.name;
-        descriptionController.text = widget.accountToEdit!.description;
+
         balanceController.text = myProvider.getTotalCreditBalance.toString();
       });
 
   void _onUpdateAccount() {
     loading.show(context: context, content: AppConfig.pleaseWait);
     final name = accNameController.text;
-    final description = descriptionController.text;
     final balance = double.parse(balanceController.text);
     if (name.isEmpty) {
       customGenericDialog(
@@ -89,6 +89,7 @@ class _AddCreditAccountBottomSheetState
       Transactions(
         id: DateTime.now().toIso8601String(),
         name: 'EditedBalance',
+        description: 'EditedBalance',
         isIncome: false,
         balance: balance,
       ),
@@ -96,7 +97,6 @@ class _AddCreditAccountBottomSheetState
     widget.accountToEdit = CreditAccount(
       id: widget.accountToEdit!.id,
       name: name,
-      description: description,
       transactions: transactionList,
     );
     myProvider.updateAccount(
@@ -113,7 +113,7 @@ class _AddCreditAccountBottomSheetState
   void _onAddAccount() {
     loading.show(context: context, content: AppConfig.pleaseWait);
     final name = accNameController.text;
-    final description = descriptionController.text;
+
     final balance = balanceController.text;
     if (name.isEmpty) {
       customGenericDialog(
@@ -131,8 +131,6 @@ class _AddCreditAccountBottomSheetState
     final userCreditAccount = CreditAccount(
       id: DateTime.now().toIso8601String(),
       name: name,
-      description:
-          description.isEmpty ? AppConfig.accountDescriptionHint : description,
       transactions: [
         Transactions.initial(
           id: DateTime.now().toIso8601String(),
@@ -187,8 +185,8 @@ class _AddCreditAccountBottomSheetState
           ),
           kTextField(
             controller: descriptionController,
-            textFieldHint: AppConfig.accountDescriptionHint,
-            textFieldLabel: AppConfig.accountDescription,
+            textFieldHint: AppConfig.transactionDescription,
+            textFieldLabel: AppConfig.transactionDescriptionHint,
             kType: TextInputType.text,
           ),
           kTextField(

@@ -36,7 +36,9 @@ class AddCreditTransactionBottomSheet extends StatefulWidget {
 class _AddCreditTransactionBottomSheetState
     extends State<AddCreditTransactionBottomSheet> {
   final transactionNameController = TextEditingController();
+  final descriptionController = TextEditingController();
   final balanceController = TextEditingController();
+
   String timeAsID = DateTime.now().toIso8601String();
   late AccountsProvider myProvider;
   bool switchValue = false;
@@ -53,6 +55,7 @@ class _AddCreditTransactionBottomSheetState
 
   @override
   void dispose() {
+    descriptionController.dispose();
     balanceController.dispose();
     transactionNameController.dispose();
     super.dispose();
@@ -72,6 +75,8 @@ class _AddCreditTransactionBottomSheetState
             widget.account.transactions[index].name;
         balanceController.text =
             widget.account.transactions[index].balance.toString();
+        descriptionController.text =
+            widget.account.transactions[index].description;
         switchValue = widget.account.transactions[index].isIncome;
       });
 
@@ -79,6 +84,7 @@ class _AddCreditTransactionBottomSheetState
     loading.show(context: context, content: AppConfig.pleaseWait);
     final balance = balanceController.text;
     final name = transactionNameController.text;
+    final description = descriptionController.text;
     if (balance.isEmpty || name.isEmpty) {
       Future.delayed(const Duration(milliseconds: 500))
           .then((value) => loading.hide());
@@ -98,6 +104,7 @@ class _AddCreditTransactionBottomSheetState
       final newTrans = Transactions(
         id: widget.account.transactions[index].id,
         name: name,
+        description: description,
         isIncome: switchValue,
         balance: double.parse(balance),
       );
@@ -110,6 +117,7 @@ class _AddCreditTransactionBottomSheetState
       final newTrans = Transactions(
         id: widget.account.transactions[index].id,
         name: name,
+        description: description,
         isIncome: switchValue,
         balance: -double.parse(balance),
       );
@@ -128,7 +136,7 @@ class _AddCreditTransactionBottomSheetState
 
   void _onAddTransaction() {
     loading.show(context: context, content: AppConfig.pleaseWait);
-
+    final description = descriptionController.text;
     final transactionName = transactionNameController.text;
     final transactionBalance = balanceController.text;
     if (transactionName.isEmpty || transactionBalance.isEmpty) {
@@ -151,6 +159,7 @@ class _AddCreditTransactionBottomSheetState
       final newTrans = Transactions(
         id: timeAsID,
         name: transactionName,
+        description: description,
         isIncome: switchValue,
         balance: double.parse(transactionBalance),
       );
@@ -162,6 +171,7 @@ class _AddCreditTransactionBottomSheetState
     } else {
       final newTrans = Transactions(
         id: timeAsID,
+        description: description,
         name: transactionName,
         isIncome: switchValue,
         balance: -double.parse(transactionBalance),
@@ -204,6 +214,12 @@ class _AddCreditTransactionBottomSheetState
             textFieldHint: AppConfig.transactionName,
             textFieldLabel: AppConfig.transactionNameHint,
             kType: TextInputType.name,
+          ),
+          kTextField(
+            controller: descriptionController,
+            textFieldHint: AppConfig.transactionDescription,
+            textFieldLabel: AppConfig.transactionDescriptionHint,
+            kType: TextInputType.text,
           ),
           kTextField(
             controller: balanceController,

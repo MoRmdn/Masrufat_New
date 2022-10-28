@@ -98,8 +98,8 @@ class _CreditAccountScreenState extends State<CreditAccountScreen> {
           children: [
             Container(
               constraints: BoxConstraints(
-                maxHeight: dSize.height * 0.3,
-                minHeight: dSize.height * 0.2,
+                maxHeight: dSize.height * 0.2,
+                minHeight: dSize.height * 0.1,
               ),
               decoration: const BoxDecoration(
                 color: AppConfig.primaryColor,
@@ -115,12 +115,6 @@ class _CreditAccountScreenState extends State<CreditAccountScreen> {
                       hight: 50,
                       title: AppConfig.accountName + ':',
                       value: widget.account.name,
-                      style: style,
-                    ),
-                    accountInfo(
-                      hight: 50,
-                      title: AppConfig.accountDescription + ':',
-                      value: widget.account.description,
                       style: style,
                     ),
                     accountInfo(

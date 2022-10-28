@@ -10,22 +10,16 @@ class DebitAccount extends HiveObject {
   @HiveField(1)
   final String name;
   @HiveField(2)
-  final String description;
-  // @HiveField(3)
-  // double balance;
-  @HiveField(3)
   final List<Transactions> transactions;
   DebitAccount({
     required this.id,
     required this.transactions,
     required this.name,
-    required this.description,
   });
   @override
   String toString() => {
         'id': id,
         'name': name,
-        'description': description,
         'transactions': transactions,
       }.toString();
 }

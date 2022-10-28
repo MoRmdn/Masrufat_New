@@ -104,8 +104,8 @@ class _DebitAccountScreenState extends State<DebitAccountScreen> {
                     BorderRadius.vertical(bottom: Radius.circular(20)),
               ),
               constraints: BoxConstraints(
-                maxHeight: dSize.height * 0.3,
-                minHeight: dSize.height * 0.2,
+                maxHeight: dSize.height * 0.2,
+                minHeight: dSize.height * 0.1,
               ),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -116,12 +116,6 @@ class _DebitAccountScreenState extends State<DebitAccountScreen> {
                       hight: 50,
                       title: AppConfig.accountName + ':',
                       value: widget.account.name,
-                      style: style,
-                    ),
-                    accountInfo(
-                      hight: 50,
-                      title: AppConfig.accountDescription + ':',
-                      value: widget.account.description,
                       style: style,
                     ),
                     accountInfo(

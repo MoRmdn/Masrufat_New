@@ -102,48 +102,54 @@ class _DebitTransactionCardState extends State<DebitTransactionCard> {
           ),
         ),
         if (isExpanded)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: () => showModalBottomSheet<void>(
-                    isScrollControlled: true,
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).viewInsets.bottom,
-                        ),
-                        child: AddDebitTransactionBottomSheet(
-                          transIndex: index,
-                          isUpdate: true,
-                          account: account,
-                          reFresh: _onRefresh,
-                        ),
-                      );
-                    },
+              Text(transaction.description),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => showModalBottomSheet<void>(
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Padding(
+                            padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).viewInsets.bottom,
+                            ),
+                            child: AddDebitTransactionBottomSheet(
+                              transIndex: index,
+                              isUpdate: true,
+                              account: account,
+                              reFresh: _onRefresh,
+                            ),
+                          );
+                        },
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: const [
+                          Text('edit'),
+                          Icon(Icons.edit),
+                        ],
+                      ),
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [
-                      Text('edit'),
-                      Icon(Icons.edit),
-                    ],
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => _onDeleteTransaction(index),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: const [
+                          Text('delete'),
+                          Icon(Icons.delete),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Expanded(
-                child: TextButton(
-                  onPressed: () => _onDeleteTransaction(index),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [
-                      Text('delete'),
-                      Icon(Icons.delete),
-                    ],
-                  ),
-                ),
+                ],
               ),
             ],
           )

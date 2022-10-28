@@ -32,7 +32,6 @@ class AddDebitAccountBottomSheet extends StatefulWidget {
 class _AddDebitAccountBottomSheetState
     extends State<AddDebitAccountBottomSheet> {
   final TextEditingController accNameController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
   final TextEditingController balanceController = TextEditingController();
   SheetMood mood = SheetMood.add;
   final loading = LoadingScreen.instance();
@@ -50,21 +49,19 @@ class _AddDebitAccountBottomSheetState
   @override
   void dispose() {
     accNameController.dispose();
-    descriptionController.dispose();
     balanceController.dispose();
     super.dispose();
   }
 
   void _updateMode() => setState(() {
         accNameController.text = widget.accountToEdit!.name;
-        descriptionController.text = widget.accountToEdit!.description;
         balanceController.text = myProvider.getTotalDebitBalance.toString();
       });
 
   void _onUpdateAccount() {
     loading.show(context: context, content: AppConfig.pleaseWait);
     final name = accNameController.text;
-    final description = descriptionController.text;
+
     final balance = double.parse(balanceController.text);
     if (name.isEmpty) {
       customGenericDialog(
@@ -87,6 +84,7 @@ class _AddDebitAccountBottomSheetState
       Transactions(
         id: DateTime.now().toIso8601String(),
         name: 'EditedBalance',
+        description: 'EditedBalance',
         isIncome: false,
         balance: balance,
       ),
@@ -94,7 +92,6 @@ class _AddDebitAccountBottomSheetState
     widget.accountToEdit = DebitAccount(
       id: widget.accountToEdit!.id,
       name: name,
-      description: description,
       transactions: transactionList,
     );
     myProvider.updateAccount(
@@ -112,7 +109,6 @@ class _AddDebitAccountBottomSheetState
   void _onAddAccount() {
     loading.show(context: context, content: AppConfig.pleaseWait);
     final name = accNameController.text;
-    final description = descriptionController.text;
     final balance = balanceController.text;
     if (name.isEmpty) {
       customGenericDialog(
@@ -130,8 +126,6 @@ class _AddDebitAccountBottomSheetState
     final userDebitAccount = DebitAccount(
       id: DateTime.now().toIso8601String(),
       name: name,
-      description:
-          description.isEmpty ? AppConfig.accountDescriptionHint : description,
       transactions: [
         Transactions.initial(
           id: DateTime.now().toIso8601String(),
@@ -183,12 +177,6 @@ class _AddDebitAccountBottomSheetState
             textFieldHint: AppConfig.accountNameHint,
             textFieldLabel: AppConfig.accountName,
             kType: TextInputType.name,
-          ),
-          kTextField(
-            controller: descriptionController,
-            textFieldHint: AppConfig.accountDescriptionHint,
-            textFieldLabel: AppConfig.accountDescription,
-            kType: TextInputType.text,
           ),
           kTextField(
             controller: balanceController,
