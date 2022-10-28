@@ -13,7 +13,6 @@ import '../../../Widgets/edit_delete_dialogs.dart';
 // ignore: must_be_immutable
 class CreditAccountCard extends StatefulWidget {
   final List<CreditAccount> accounts;
-
   const CreditAccountCard({
     Key? key,
     required this.accounts,
@@ -25,10 +24,9 @@ class CreditAccountCard extends StatefulWidget {
 
 class _CreditAccountCardState extends State<CreditAccountCard> {
   late AccountsProvider myProvider;
-
   @override
   void initState() {
-    myProvider = Provider.of<AccountsProvider>(context, listen: false);
+    myProvider = Provider.of(context, listen: false);
     super.initState();
   }
 
@@ -48,59 +46,63 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
   Widget build(BuildContext context) {
     log('Balance Rebuild ');
     final orientation = MediaQuery.of(context).orientation;
+    const style = TextStyle(color: Colors.white, fontSize: 20);
     return SizedBox(
       height: MediaQuery.of(context).size.height,
       child: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.1,
-              child: Card(
-                elevation: 6,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Consumer<AccountsProvider>(
-                    builder: (_, snapShot, child) => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: Text(
-                                AppConfig.grandTotalBalance,
-                                style: Theme.of(context).textTheme.headline6,
-                              ),
+            Container(
+              decoration: const BoxDecoration(
+                color: AppConfig.primaryColor,
+                borderRadius:
+                    BorderRadius.vertical(bottom: Radius.circular(20)),
+              ),
+              height: MediaQuery.of(context).size.height * 0.12,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Consumer<AccountsProvider>(
+                  builder: (_, snapShot, child) => Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(
+                            flex: 3,
+                            child: Text(
+                              AppConfig.grandTotalBalance,
+                              style: style,
                             ),
-                            Expanded(
-                              child: Text(
-                                '${snapShot.getTotalGrandBalance} \$',
-                                style: Theme.of(context).textTheme.headline6,
-                              ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              '${snapShot.getTotalGrandBalance} \$',
+                              style: style,
                             ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: Text(
-                                AppConfig.totalBalance,
-                                style: Theme.of(context).textTheme.headline6,
-                              ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(
+                            flex: 3,
+                            child: Text(
+                              AppConfig.totalBalance,
+                              style: style,
                             ),
-                            Expanded(
-                              child: Text(
-                                '${snapShot.getTotalCreditBalance} \$',
-                                style: Theme.of(context).textTheme.headline6,
-                              ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              '${snapShot.getTotalCreditBalance} \$',
+                              style: style,
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -111,7 +113,7 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
                 itemCount: widget.accounts.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: orientation == Orientation.portrait ? 1 : 2,
-                  childAspectRatio: 3,
+                  childAspectRatio: 2.5,
                 ),
                 itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.all(10.0),
@@ -161,24 +163,6 @@ class _CreditAccountCardState extends State<CreditAccountCard> {
                             child: Text(
                               widget.accounts[index].name,
                               style: Theme.of(context).textTheme.displayLarge,
-                            ),
-                          ),
-                        ),
-                        footer: Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.black12,
-                            borderRadius: BorderRadius.vertical(
-                              bottom: Radius.circular(20),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Row(
-                              children: [
-                                const Text(AppConfig.accountBalance),
-                                const Spacer(),
-                                Text(widget.accounts[index].balance.toString()),
-                              ],
                             ),
                           ),
                         ),

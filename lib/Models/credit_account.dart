@@ -11,23 +11,21 @@ class CreditAccount extends HiveObject {
   final String name;
   @HiveField(2)
   final String description;
+  // @HiveField(3)
+  // double balance;
   @HiveField(3)
-  double balance;
-  @HiveField(4)
   final List<Transactions> transactions;
   CreditAccount({
     required this.transactions,
     required this.id,
     required this.name,
     required this.description,
-    required this.balance,
   });
 
   Map<String, dynamic> toMap() => {
         'id': id,
         'name': name,
         'description': description,
-        'balance': balance,
         'transactions': transactions,
       };
 
@@ -35,7 +33,6 @@ class CreditAccount extends HiveObject {
     return CreditAccount(
       name: map['name'],
       description: map['description'],
-      balance: map['balance'],
       id: map['id'],
       transactions: map['transactions'],
     );
@@ -46,7 +43,6 @@ class CreditAccount extends HiveObject {
         'id': id,
         'name': name,
         'description': description,
-        'balance': balance,
         'transactions': transactions,
       }.toString();
 }

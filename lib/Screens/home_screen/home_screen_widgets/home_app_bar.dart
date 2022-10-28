@@ -11,6 +11,8 @@ AppBar getAppBar({
 }) {
   if (bottomNavIndex == 0) {
     return AppBar(
+      elevation: 0,
+      foregroundColor: AppConfig.secondaryColor,
       title: const Text(AppConfig.myAccount),
       actions: [
         IconButton(
@@ -34,6 +36,8 @@ AppBar getAppBar({
     );
   } else if (bottomNavIndex == 1) {
     return AppBar(
+      elevation: 0,
+      foregroundColor: AppConfig.secondaryColor,
       title: const Text(AppConfig.debit),
       actions: [
         IconButton(
@@ -57,10 +61,12 @@ AppBar getAppBar({
     );
   } else if (bottomNavIndex == 2) {
     return AppBar(
+      foregroundColor: AppConfig.secondaryColor,
       title: const Text(AppConfig.expenses),
     );
   } else {
     return AppBar(
+      foregroundColor: AppConfig.secondaryColor,
       title: const Text(AppConfig.settings),
     );
   }

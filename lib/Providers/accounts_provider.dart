@@ -50,13 +50,12 @@ class AccountsProvider with ChangeNotifier {
       _userCreditAccounts.add(userCreditAccount);
       //? add account to Local DataBase
       _dataBaseBoxForCredit.put(userCreditAccount.id, userCreditAccount);
-      _totalCreditBalance += userCreditAccount.balance;
+      fetchCreditBalance();
       log('this is Credit Account You ADD $_userCreditAccounts');
     } else if (userDebitAccount != null) {
       _userDebitAccounts.add(userDebitAccount);
       _dataBaseBoxForDebit.put(userDebitAccount.id, userDebitAccount);
-      _totalDebitBalance += userDebitAccount.balance;
-
+      fetchDebitBalance();
       log('this is Debit Account You ADD $_userDebitAccounts');
     }
     _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
@@ -81,17 +80,7 @@ class AccountsProvider with ChangeNotifier {
         updatedUserCreditAccount,
       );
       //? update Balance
-      if (updatedUserCreditAccount.balance >
-          _userCreditAccounts[oldAccountIndex].balance) {
-        final newSurplus = updatedUserCreditAccount.balance -
-            _userCreditAccounts[oldAccountIndex].balance;
-        _totalCreditBalance += newSurplus;
-      } else if (updatedUserCreditAccount.balance <
-          _userCreditAccounts[oldAccountIndex].balance) {
-        final shortage = updatedUserCreditAccount.balance -
-            _userCreditAccounts[oldAccountIndex].balance;
-        _totalCreditBalance -= shortage;
-      }
+      fetchBalance();
       log('updatedUserCreditAccount');
     } else if (updatedUserDebitAccount != null) {
       //? get old account
@@ -108,17 +97,6 @@ class AccountsProvider with ChangeNotifier {
       );
 
       log('updatedUserDebitAccount');
-      if (updatedUserDebitAccount.balance >
-          _userDebitAccounts[oldAccountIndex].balance) {
-        final newSurplus = updatedUserDebitAccount.balance -
-            _userDebitAccounts[oldAccountIndex].balance;
-        _totalCreditBalance += newSurplus;
-      } else if (updatedUserDebitAccount.balance <
-          _userDebitAccounts[oldAccountIndex].balance) {
-        final shortage = updatedUserDebitAccount.balance -
-            _userDebitAccounts[oldAccountIndex].balance;
-        _totalCreditBalance += shortage;
-      }
     }
     notifyListeners();
   }
@@ -130,12 +108,12 @@ class AccountsProvider with ChangeNotifier {
     if (deleteUserCreditAccount != null) {
       _userCreditAccounts.remove(deleteUserCreditAccount);
       deleteUserCreditAccount.delete();
-      _totalCreditBalance -= deleteUserCreditAccount.balance;
+      fetchCreditBalance();
       log('deleteCreditAccount');
     } else if (deleteUserDebitAccount != null) {
       _userDebitAccounts.remove(deleteUserDebitAccount);
       deleteUserDebitAccount.delete();
-      _totalDebitBalance -= deleteUserDebitAccount.balance;
+      fetchDebitBalance();
       log('deleteDebitAccount');
     }
     _grandTotalBalance = _totalCreditBalance + _totalDebitBalance;
@@ -152,15 +130,15 @@ class AccountsProvider with ChangeNotifier {
       existCreditAccount.transactions.add(newTransaction);
 
       //? add transactionBalance to total balance of the account
-      existCreditAccount.balance += newTransaction.balance;
-      _totalCreditBalance += newTransaction.balance;
 
+      _totalCreditBalance += newTransaction.balance;
+      _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
       //? save New Updated Account to DataBase
       _dataBaseBoxForCredit.put(existCreditAccount.id, existCreditAccount);
     } else if (existDebitAccount != null) {
       existDebitAccount.transactions.add(newTransaction);
-      existDebitAccount.balance += newTransaction.balance;
       _totalDebitBalance += newTransaction.balance;
+      _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
       _dataBaseBoxForDebit.put(existDebitAccount.id, existDebitAccount);
     }
     _grandTotalBalance = _totalCreditBalance + _totalDebitBalance;
@@ -176,20 +154,16 @@ class AccountsProvider with ChangeNotifier {
       final index = creditAccount.transactions
           .indexWhere((element) => element.id == newTransaction.id);
       //? this is the old transaction
-      final oldTransaction = creditAccount.transactions[index];
-      creditAccount.balance -= oldTransaction.balance;
-      creditAccount.balance += newTransaction.balance;
       creditAccount.transactions[index] = newTransaction;
+      fetchCreditBalance();
       //? save New Updated Account to DataBase
       _dataBaseBoxForCredit.put(creditAccount.id, creditAccount);
     } else if (debitAccount != null) {
       final index = debitAccount.transactions
           .indexWhere((element) => element.id == newTransaction.id);
       //? this is the old transaction
-      final oldTransaction = debitAccount.transactions[index];
-      debitAccount.balance -= oldTransaction.balance;
-      debitAccount.balance += newTransaction.balance;
       debitAccount.transactions[index] = newTransaction;
+      fetchDebitBalance();
       //? save New Updated Account to DataBase
       _dataBaseBoxForDebit.put(debitAccount.id, debitAccount);
     }
@@ -197,11 +171,25 @@ class AccountsProvider with ChangeNotifier {
   }
 
   Future<void> fetchBalance() async {
+    fetchCreditBalance();
+    fetchDebitBalance();
+    _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
+  }
+
+  Future<void> fetchCreditBalance() async {
     for (var element in _userCreditAccounts) {
-      _totalCreditBalance += element.balance;
+      for (var trans in element.transactions) {
+        _totalCreditBalance += trans.balance;
+      }
     }
+    _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
+  }
+
+  Future<void> fetchDebitBalance() async {
     for (var element in _userDebitAccounts) {
-      _totalDebitBalance += element.balance;
+      for (var trans in element.transactions) {
+        _totalDebitBalance += trans.balance;
+      }
     }
     _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
   }
@@ -216,7 +204,7 @@ class AccountsProvider with ChangeNotifier {
       final currentTransaction = creditAccount.transactions[index];
 
       //? subtract transaction value from total balance
-      creditAccount.balance -= currentTransaction.balance;
+
       _totalCreditBalance -= currentTransaction.balance;
       //? delete it
       creditAccount.transactions
@@ -228,7 +216,6 @@ class AccountsProvider with ChangeNotifier {
       final currentTransaction = debitAccount.transactions[index];
 
       //? subtract transaction value from total balance
-      debitAccount.balance -= currentTransaction.balance;
       _totalDebitBalance -= currentTransaction.balance;
       //? delete it
       debitAccount.transactions

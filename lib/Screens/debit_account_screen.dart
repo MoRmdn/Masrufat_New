@@ -3,7 +3,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/debit_account.dart';
 import 'package:masrufat/helper/app_config.dart';
+import 'package:provider/provider.dart';
 
+import '../Providers/accounts_provider.dart';
 import 'debit_account_screen/transaction_widgets/add_debit_transaction_bottom_sheet.dart';
 import 'debit_account_screen/transaction_widgets/debit_transaction_card.dart';
 
@@ -21,9 +23,17 @@ class DebitAccountScreen extends StatefulWidget {
 }
 
 class _DebitAccountScreenState extends State<DebitAccountScreen> {
+  late AccountsProvider myProvider;
+
   bool isExpanded = false;
 
   void _onRefresh() => setState(() {});
+
+  @override
+  void didChangeDependencies() {
+    myProvider = Provider.of<AccountsProvider>(context, listen: false);
+    super.didChangeDependencies();
+  }
 
   Widget accountInfo({
     required double hight,
@@ -111,7 +121,7 @@ class _DebitAccountScreenState extends State<DebitAccountScreen> {
                         accountInfo(
                           hight: 50,
                           title: AppConfig.accountBalance + ':',
-                          value: widget.account.balance.toString(),
+                          value: myProvider.getTotalDebitBalance.toString(),
                           style: Theme.of(context).textTheme.bodyLarge!,
                         ),
                       ],
