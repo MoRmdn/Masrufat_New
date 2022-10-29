@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/credit_account.dart';
@@ -37,9 +39,6 @@ class _NavigationScreenState extends State<NavigationScreen>
   List<Transactions> expenses = [];
   double totalExpenses = 0.0;
   double totalExpensesThisMonth = 0.0;
-  double totalCreditBalance = 0.0;
-  double totalDebitBalance = 0.0;
-  double grandTotalBalance = 0.0;
   late AnimationController _controller;
   late Animation<double> animation;
 
@@ -85,32 +84,27 @@ class _NavigationScreenState extends State<NavigationScreen>
   }
 
   Future<void> fetchData() async {
-    Future.delayed(const Duration(microseconds: 500)).then((value) {
+    Future.delayed(const Duration(microseconds: 0)).then((value) {
       creditAccount = myProvider.getUserCreditAccounts;
       debitAccount = myProvider.getUserDebitAccounts;
       expensesThisMonth = myProvider.getUserExpensesPerMonth;
       expenses = myProvider.getUserExpenses;
       totalExpenses = myProvider.getTotalExpenses;
       totalExpensesThisMonth = myProvider.getTotalPerMonthExpenses;
-      totalCreditBalance = myProvider.getTotalCreditBalance;
-      totalDebitBalance = myProvider.getTotalDebitBalance;
-      grandTotalBalance = myProvider.getTotalGrandBalance;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    log('Navigation');
     fetchData();
     return creditAccount.isNotEmpty && widget.index == 0
         ? CreditAccountCard(
             accounts: creditAccount,
-            grandTotalBalance: grandTotalBalance,
-            totalCreditBalance: totalCreditBalance,
           )
         : debitAccount.isNotEmpty && widget.index == 1
             ? DebitAccountCard(
                 accounts: debitAccount,
-                totalDebitBalance: totalDebitBalance,
               )
             : widget.index == 2 && expenses.isNotEmpty
                 ? Expenses(

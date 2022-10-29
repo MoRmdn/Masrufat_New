@@ -20,28 +20,22 @@ class AccountsProvider with ChangeNotifier {
       Hive.box<DebitAccount>(AppConfig.dataBaseBoxForDebit);
   List<CreditAccount> _userCreditAccounts = [];
   List<DebitAccount> _userDebitAccounts = [];
-  final List<Transactions> _expensesTransaction = [];
-  final List<Transactions> _expensesPerMonthTransaction = [];
+  List<Transactions> _expensesTransaction = [];
+  List<Transactions> _expensesThisMonthTransaction = [];
   //? debit + credit Balance
   double _grandTotalBalance = 0.0;
   double _totalCreditBalance = 0.0;
   double _totalDebitBalance = 0.0;
   double _totalExpenses = 0.0;
-  double _totalPerMonthExpenses = 0.0;
+  double _totalThisMonthExpenses = 0.0;
 
   Future<void> fetchDataBaseBox() async {
     _userCreditAccounts =
         _dataBaseBoxForCredit.values.toList().cast<CreditAccount>();
-    for (var element in _userCreditAccounts) {
-      _totalCreditBalance += element.balance;
-    }
     _userDebitAccounts =
         _dataBaseBoxForDebit.values.toList().cast<DebitAccount>();
-    for (var element in _userDebitAccounts) {
-      _totalDebitBalance += element.balance;
-    }
-    _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
-    _userExpenses();
+    _userCreditExpenses();
+    fetchBalance();
     log('this is your Credit Accounts $_userCreditAccounts');
     log('this is your Debit Accounts $_userDebitAccounts');
     notifyListeners();
@@ -56,12 +50,15 @@ class AccountsProvider with ChangeNotifier {
       _userCreditAccounts.add(userCreditAccount);
       //? add account to Local DataBase
       _dataBaseBoxForCredit.put(userCreditAccount.id, userCreditAccount);
+      fetchCreditBalance();
       log('this is Credit Account You ADD $_userCreditAccounts');
     } else if (userDebitAccount != null) {
       _userDebitAccounts.add(userDebitAccount);
       _dataBaseBoxForDebit.put(userDebitAccount.id, userDebitAccount);
+      fetchDebitBalance();
       log('this is Debit Account You ADD $_userDebitAccounts');
     }
+    _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
     notifyListeners();
   }
 
@@ -82,6 +79,8 @@ class AccountsProvider with ChangeNotifier {
         updatedUserCreditAccount.id,
         updatedUserCreditAccount,
       );
+      //? update Balance
+      fetchBalance();
       log('updatedUserCreditAccount');
     } else if (updatedUserDebitAccount != null) {
       //? get old account
@@ -96,6 +95,7 @@ class AccountsProvider with ChangeNotifier {
         updatedUserDebitAccount.id,
         updatedUserDebitAccount,
       );
+
       log('updatedUserDebitAccount');
     }
     notifyListeners();
@@ -108,12 +108,15 @@ class AccountsProvider with ChangeNotifier {
     if (deleteUserCreditAccount != null) {
       _userCreditAccounts.remove(deleteUserCreditAccount);
       deleteUserCreditAccount.delete();
+      fetchCreditBalance();
       log('deleteCreditAccount');
     } else if (deleteUserDebitAccount != null) {
       _userDebitAccounts.remove(deleteUserDebitAccount);
       deleteUserDebitAccount.delete();
+      fetchDebitBalance();
       log('deleteDebitAccount');
     }
+    _grandTotalBalance = _totalCreditBalance + _totalDebitBalance;
     notifyListeners();
   }
 
@@ -127,15 +130,21 @@ class AccountsProvider with ChangeNotifier {
       existCreditAccount.transactions.add(newTransaction);
 
       //? add transactionBalance to total balance of the account
-      existCreditAccount.balance += newTransaction.balance;
 
+      _totalCreditBalance += newTransaction.balance;
+      _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
       //? save New Updated Account to DataBase
       _dataBaseBoxForCredit.put(existCreditAccount.id, existCreditAccount);
     } else if (existDebitAccount != null) {
       existDebitAccount.transactions.add(newTransaction);
-      existDebitAccount.balance += newTransaction.balance;
+      _totalDebitBalance += newTransaction.balance;
+      _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
       _dataBaseBoxForDebit.put(existDebitAccount.id, existDebitAccount);
     }
+    if (!newTransaction.isIncome) {
+      _userCreditExpenses();
+    }
+    _grandTotalBalance = _totalCreditBalance + _totalDebitBalance;
     notifyListeners();
   }
 
@@ -148,24 +157,47 @@ class AccountsProvider with ChangeNotifier {
       final index = creditAccount.transactions
           .indexWhere((element) => element.id == newTransaction.id);
       //? this is the old transaction
-      final oldTransaction = creditAccount.transactions[index];
-      creditAccount.balance -= oldTransaction.balance;
-      creditAccount.balance += newTransaction.balance;
       creditAccount.transactions[index] = newTransaction;
+      fetchCreditBalance();
       //? save New Updated Account to DataBase
       _dataBaseBoxForCredit.put(creditAccount.id, creditAccount);
     } else if (debitAccount != null) {
       final index = debitAccount.transactions
           .indexWhere((element) => element.id == newTransaction.id);
       //? this is the old transaction
-      final oldTransaction = debitAccount.transactions[index];
-      debitAccount.balance -= oldTransaction.balance;
-      debitAccount.balance += newTransaction.balance;
       debitAccount.transactions[index] = newTransaction;
+      fetchDebitBalance();
       //? save New Updated Account to DataBase
       _dataBaseBoxForDebit.put(debitAccount.id, debitAccount);
     }
+    if (!newTransaction.isIncome) {
+      _userCreditExpenses();
+    }
     notifyListeners();
+  }
+
+  Future<void> fetchBalance() async {
+    fetchCreditBalance();
+    fetchDebitBalance();
+    _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
+  }
+
+  Future<void> fetchCreditBalance() async {
+    for (var element in _userCreditAccounts) {
+      for (var trans in element.transactions) {
+        _totalCreditBalance += trans.balance;
+      }
+    }
+    _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
+  }
+
+  Future<void> fetchDebitBalance() async {
+    for (var element in _userDebitAccounts) {
+      for (var trans in element.transactions) {
+        _totalDebitBalance += trans.balance;
+      }
+    }
+    _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
   }
 
   Future<void> deleteTransaction({
@@ -178,7 +210,8 @@ class AccountsProvider with ChangeNotifier {
       final currentTransaction = creditAccount.transactions[index];
 
       //? subtract transaction value from total balance
-      creditAccount.balance -= currentTransaction.balance;
+
+      _totalCreditBalance -= currentTransaction.balance;
       //? delete it
       creditAccount.transactions
           .removeWhere((element) => element.id == currentTransaction.id);
@@ -189,38 +222,59 @@ class AccountsProvider with ChangeNotifier {
       final currentTransaction = debitAccount.transactions[index];
 
       //? subtract transaction value from total balance
-      debitAccount.balance -= currentTransaction.balance;
+      _totalDebitBalance -= currentTransaction.balance;
       //? delete it
       debitAccount.transactions
           .removeWhere((element) => element.id == currentTransaction.id);
       //* save account
       _dataBaseBoxForDebit.put(debitAccount.id, debitAccount);
     }
+    _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
     log('deleted Account');
     notifyListeners();
   }
 
-  Future<void> _userExpenses() async {
+  Future<void> _userCreditExpenses() async {
+    List<Transactions> expensesNew = [];
+    List<Transactions> expensesNewThisMonth = [];
+    double expensesTotal = 0;
+    double expensesThisMonth = 0;
     for (var element in _userCreditAccounts) {
       for (var element in element.transactions) {
-        if (element.isIncome == false) {
-          _totalExpenses += element.balance;
-          _expensesTransaction.add(element);
+        if (!element.isIncome) {
+          expensesTotal += element.balance;
+          expensesNew.add(element);
           DateTime date = DateTime.parse(element.id);
           //* check if this transaction happen this month or not
           if (date.month == DateTime.now().month) {
-            _totalPerMonthExpenses += element.balance;
-            _expensesPerMonthTransaction.add(element);
+            expensesThisMonth += element.balance;
+            expensesNewThisMonth.add(element);
           }
         }
       }
     }
+    _totalExpenses = expensesTotal;
+    _totalThisMonthExpenses = expensesThisMonth;
+    _expensesTransaction = expensesNew;
+    _expensesThisMonthTransaction = expensesNewThisMonth;
     notifyListeners();
   }
 
   Future<void> deleteDataBase() async {
+    _grandTotalBalance = 0.0;
+    _totalCreditBalance = 0.0;
+    _totalDebitBalance = 0.0;
+    _totalExpenses = 0.0;
+    _totalThisMonthExpenses = 0.0;
+    _expensesTransaction = [];
+    _expensesThisMonthTransaction = [];
     _userCreditAccounts = [];
+    _userDebitAccounts = [];
     _dataBaseBoxForCredit.deleteFromDisk();
+    _dataBaseBoxForDebit.deleteFromDisk();
+
+    //? debit + credit Balance
+
     notifyListeners();
   }
 
@@ -229,9 +283,9 @@ class AccountsProvider with ChangeNotifier {
   List<DebitAccount> get getUserDebitAccounts => _userDebitAccounts;
   List<Transactions> get getUserExpenses => _expensesTransaction;
   List<Transactions> get getUserExpensesPerMonth =>
-      _expensesPerMonthTransaction;
+      _expensesThisMonthTransaction;
   double get getTotalExpenses => _totalExpenses;
-  double get getTotalPerMonthExpenses => _totalPerMonthExpenses;
+  double get getTotalPerMonthExpenses => _totalThisMonthExpenses;
 
   double get getTotalGrandBalance => _grandTotalBalance;
   double get getTotalCreditBalance => _totalCreditBalance;

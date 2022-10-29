@@ -13,11 +13,14 @@ class Transactions extends HiveObject {
   @HiveField(3)
   final bool isIncome;
   @HiveField(4)
+  final String description;
+  @HiveField(5)
   String? transferTo;
 
   Transactions({
     required this.id,
     required this.name,
+    required this.description,
     required this.isIncome,
     required this.balance,
     this.transferTo,
@@ -30,12 +33,14 @@ class Transactions extends HiveObject {
       isIncome: map['isIncome'],
       id: map['id'],
       transferTo: map['transferTo'],
+      description: map['description'],
     );
   }
 
   Transactions.initial({
     required this.id,
     required this.balance,
+    this.description = 'initial Transaction',
     this.name = 'initial Transaction',
     this.isIncome = true,
   });
@@ -45,6 +50,7 @@ class Transactions extends HiveObject {
         'name': name,
         'isIncome': isIncome,
         'balance': balance,
+        'description': description,
         'transferTo': transferTo,
       };
 
@@ -53,6 +59,7 @@ class Transactions extends HiveObject {
         'id': id,
         'name': name,
         'isIncome': isIncome,
+        'description': description,
         'transferTo': transferTo,
         'balance': balance,
       }.toString();

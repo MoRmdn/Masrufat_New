@@ -1,13 +1,14 @@
+import 'dart:developer';
+
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
-import 'package:masrufat/Screens/home_screen/widgets/home_app_bar.dart';
+import 'package:masrufat/Screens/home_screen/home_screen_widgets/home_app_bar.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import '../credit_account_screen/account_widgets/add_credit_account_bottom_sheet.dart';
-import '../debit_account_screen/account_widgets/add_account_bottom_sheet.dart';
+import '../../Widgets/floating_action_button_method.dart';
 import '../navigation_screens.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -20,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final autoSizeGroup = AutoSizeGroup();
   var _bottomNavIndex = 0; //default index of a first screen
 
@@ -43,7 +45,6 @@ class _HomeScreenState extends State<HomeScreen>
       const Duration(milliseconds: 500),
       () => myProvider.fetchDataBaseBox(),
     );
-
     _animationController = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
@@ -70,6 +71,11 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
@@ -77,68 +83,16 @@ class _HomeScreenState extends State<HomeScreen>
 
   void _onRefresh() => setState(() {});
 
-  Future<void> _askedToLoad() async {
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          title: const Text('Select AccountType'),
-          children: <Widget>[
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.of(context).pop();
-                showModalBottomSheet<void>(
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom,
-                      ),
-                      child: AddCreditAccountBottomSheet(
-                        onRefresh: _onRefresh,
-                      ),
-                    );
-                  },
-                );
-              },
-              child: const Text('Credit Account'),
-            ),
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.of(context).pop();
-                showModalBottomSheet<void>(
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom,
-                      ),
-                      child: AddDebitAccountBottomSheet(
-                        onRefresh: _onRefresh,
-                      ),
-                    );
-                  },
-                );
-              },
-              child: const Text('Debit Account'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    log('Home Screen');
     dSize = MediaQuery.of(context).size;
     return Scaffold(
+      key: _scaffoldKey,
       appBar: getAppBar(
         context: context,
         bottomNavIndex: _bottomNavIndex,
         onRefresh: _onRefresh,
-        askToLoad: _askedToLoad,
       ),
       body: NavigationScreen(
         index: _bottomNavIndex,
@@ -156,7 +110,10 @@ class _HomeScreenState extends State<HomeScreen>
           onPressed: () {
             _animationController.reset();
             _animationController.forward();
-            _askedToLoad();
+            loadAccountCreation(
+              context: _scaffoldKey.currentContext!,
+              onRefresh: _onRefresh,
+            );
           },
         ),
       ),

@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../../../helper/app_config.dart';
 import '../../credit_account_screen/account_widgets/add_credit_account_bottom_sheet.dart';
-import '../../debit_account_screen/account_widgets/add_account_bottom_sheet.dart';
+import '../../debit_account_screen/account_widgets/add_debit_account_bottom_sheet.dart';
 
 AppBar getAppBar({
   required BuildContext context,
   required int bottomNavIndex,
   required VoidCallback onRefresh,
-  required VoidCallback askToLoad,
 }) {
   if (bottomNavIndex == 0) {
     return AppBar(
+      elevation: 0,
+      foregroundColor: AppConfig.secondaryColor,
       title: const Text(AppConfig.myAccount),
       actions: [
         IconButton(
@@ -35,6 +36,8 @@ AppBar getAppBar({
     );
   } else if (bottomNavIndex == 1) {
     return AppBar(
+      elevation: 0,
+      foregroundColor: AppConfig.secondaryColor,
       title: const Text(AppConfig.debit),
       actions: [
         IconButton(
@@ -58,10 +61,12 @@ AppBar getAppBar({
     );
   } else if (bottomNavIndex == 2) {
     return AppBar(
+      foregroundColor: AppConfig.secondaryColor,
       title: const Text(AppConfig.expenses),
     );
   } else {
     return AppBar(
+      foregroundColor: AppConfig.secondaryColor,
       title: const Text(AppConfig.settings),
     );
   }

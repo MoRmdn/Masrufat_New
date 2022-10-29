@@ -37,9 +37,10 @@ class _AddDebitTransactionBottomSheetState
     extends State<AddDebitTransactionBottomSheet> {
   final transactionNameController = TextEditingController();
   final balanceController = TextEditingController();
+  final descriptionController = TextEditingController();
   String timeAsID = DateTime.now().toIso8601String();
   late AccountsProvider myProvider;
-  bool switchValue = false;
+  bool switchValue = true;
   TansMood mood = TansMood.add;
   final loading = LoadingScreen.instance();
 
@@ -53,6 +54,7 @@ class _AddDebitTransactionBottomSheetState
 
   @override
   void dispose() {
+    descriptionController.dispose();
     balanceController.dispose();
     transactionNameController.dispose();
     super.dispose();
@@ -77,6 +79,7 @@ class _AddDebitTransactionBottomSheetState
 
   void _onUpdateTransaction() {
     loading.show(context: context, content: AppConfig.pleaseWait);
+    final description = descriptionController.text;
     final balance = balanceController.text;
     final name = transactionNameController.text;
     if (balance.isEmpty || name.isEmpty) {
@@ -98,6 +101,7 @@ class _AddDebitTransactionBottomSheetState
       final newTrans = Transactions(
         id: widget.account.transactions[index].id,
         name: name,
+        description: description,
         isIncome: switchValue,
         balance: double.parse(balance),
       );
@@ -110,6 +114,7 @@ class _AddDebitTransactionBottomSheetState
       final newTrans = Transactions(
         id: widget.account.transactions[index].id,
         name: name,
+        description: description,
         isIncome: switchValue,
         balance: -double.parse(balance),
       );
@@ -128,7 +133,7 @@ class _AddDebitTransactionBottomSheetState
 
   void _onAddTransaction() {
     loading.show(context: context, content: AppConfig.pleaseWait);
-
+    final description = descriptionController.text;
     final transactionName = transactionNameController.text;
     final transactionBalance = balanceController.text;
     if (transactionName.isEmpty || transactionBalance.isEmpty) {
@@ -150,6 +155,7 @@ class _AddDebitTransactionBottomSheetState
     if (switchValue) {
       final newTrans = Transactions(
         id: timeAsID,
+        description: description,
         name: transactionName,
         isIncome: switchValue,
         balance: double.parse(transactionBalance),
@@ -162,6 +168,7 @@ class _AddDebitTransactionBottomSheetState
     } else {
       final newTrans = Transactions(
         id: timeAsID,
+        description: description,
         name: transactionName,
         isIncome: switchValue,
         balance: -double.parse(transactionBalance),
@@ -204,6 +211,12 @@ class _AddDebitTransactionBottomSheetState
             textFieldHint: AppConfig.transactionName,
             textFieldLabel: AppConfig.transactionNameHint,
             kType: TextInputType.name,
+          ),
+          kTextField(
+            controller: descriptionController,
+            textFieldHint: AppConfig.transactionDescription,
+            textFieldLabel: AppConfig.transactionDescriptionHint,
+            kType: TextInputType.text,
           ),
           kTextField(
             controller: balanceController,

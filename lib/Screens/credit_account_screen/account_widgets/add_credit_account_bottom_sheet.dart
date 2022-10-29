@@ -18,7 +18,6 @@ enum SheetMood {
 class AddCreditAccountBottomSheet extends StatefulWidget {
   final VoidCallback onRefresh;
   CreditAccount? accountToEdit;
-
   AddCreditAccountBottomSheet({
     Key? key,
     required this.onRefresh,
@@ -33,8 +32,9 @@ class AddCreditAccountBottomSheet extends StatefulWidget {
 class _AddCreditAccountBottomSheetState
     extends State<AddCreditAccountBottomSheet> {
   final TextEditingController accNameController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
   final TextEditingController balanceController = TextEditingController();
+  final descriptionController = TextEditingController();
+
   SheetMood mood = SheetMood.add;
   final loading = LoadingScreen.instance();
   late Size dSize;
@@ -58,16 +58,15 @@ class _AddCreditAccountBottomSheetState
 
   void _updateMode() => setState(() {
         accNameController.text = widget.accountToEdit!.name;
-        descriptionController.text = widget.accountToEdit!.description;
-        balanceController.text = widget.accountToEdit!.balance.toString();
+
+        balanceController.text = myProvider.getTotalCreditBalance.toString();
       });
 
   void _onUpdateAccount() {
     loading.show(context: context, content: AppConfig.pleaseWait);
     final name = accNameController.text;
-    final description = descriptionController.text;
-    final balance = balanceController.text;
-    if (name.isEmpty || balance.isEmpty || description.isEmpty) {
+    final balance = double.parse(balanceController.text);
+    if (name.isEmpty) {
       customGenericDialog(
         context: context,
         title: AppConfig.dialogErrorTitle,
@@ -82,56 +81,28 @@ class _AddCreditAccountBottomSheetState
           .then((value) => loading.hide());
       return;
     }
-    final oldBalance = widget.accountToEdit!.balance;
-    if (oldBalance > double.parse(balance)) {
-      final tranNewBalance = oldBalance - double.parse(balance);
-      List<Transactions> transactionList = widget.accountToEdit!.transactions;
-      transactionList.add(
-        Transactions(
-          id: DateTime.now().toIso8601String(),
-          name: 'EditedBalance',
-          isIncome: false,
-          balance: tranNewBalance,
-        ),
-      );
-      widget.accountToEdit = CreditAccount(
-        id: widget.accountToEdit!.id,
-        name: name,
-        description: description,
-        balance: double.parse(
-          balance,
-        ),
-        transactions: transactionList,
-      );
-      myProvider.updateAccount(
-        updatedUserCreditAccount: widget.accountToEdit!,
-        updatedUserDebitAccount: null,
-      );
-    } else {
-      final tranNewBalance = double.parse(balance) - oldBalance;
-      List<Transactions> transactionList = widget.accountToEdit!.transactions;
-      transactionList.add(
-        Transactions(
-          id: DateTime.now().toIso8601String(),
-          name: AppConfig.transactionEditedBalance,
-          isIncome: true,
-          balance: tranNewBalance,
-        ),
-      );
-      widget.accountToEdit = CreditAccount(
-        id: widget.accountToEdit!.id,
-        name: name,
-        description: description,
-        balance: double.parse(
-          balance,
-        ),
-        transactions: transactionList,
-      );
-      myProvider.updateAccount(
-        updatedUserCreditAccount: widget.accountToEdit!,
-        updatedUserDebitAccount: null,
-      );
-    }
+    // final oldBalance = myProvider.getTotalCreditBalance;
+    // if (oldBalance > double.parse(balance)) {
+
+    List<Transactions> transactionList = widget.accountToEdit!.transactions;
+    transactionList.add(
+      Transactions(
+        id: DateTime.now().toIso8601String(),
+        name: 'EditedBalance',
+        description: 'EditedBalance',
+        isIncome: false,
+        balance: balance,
+      ),
+    );
+    widget.accountToEdit = CreditAccount(
+      id: widget.accountToEdit!.id,
+      name: name,
+      transactions: transactionList,
+    );
+    myProvider.updateAccount(
+      updatedUserCreditAccount: widget.accountToEdit!,
+      updatedUserDebitAccount: null,
+    );
 
     widget.onRefresh();
     Future.delayed(const Duration(milliseconds: 500))
@@ -142,7 +113,7 @@ class _AddCreditAccountBottomSheetState
   void _onAddAccount() {
     loading.show(context: context, content: AppConfig.pleaseWait);
     final name = accNameController.text;
-    final description = descriptionController.text;
+
     final balance = balanceController.text;
     if (name.isEmpty) {
       customGenericDialog(
@@ -160,15 +131,12 @@ class _AddCreditAccountBottomSheetState
     final userCreditAccount = CreditAccount(
       id: DateTime.now().toIso8601String(),
       name: name,
-      description:
-          description.isEmpty ? AppConfig.accountDescriptionHint : description,
-      balance: double.parse(
-        balance.isEmpty ? AppConfig.accountBalanceHint : balance,
-      ),
       transactions: [
         Transactions.initial(
           id: DateTime.now().toIso8601String(),
-          balance: double.parse(balance),
+          balance: double.parse(
+            balance.isEmpty ? '0.0' : balance,
+          ),
         )
       ],
     );
@@ -217,8 +185,8 @@ class _AddCreditAccountBottomSheetState
           ),
           kTextField(
             controller: descriptionController,
-            textFieldHint: AppConfig.accountDescriptionHint,
-            textFieldLabel: AppConfig.accountDescription,
+            textFieldHint: AppConfig.transactionDescription,
+            textFieldLabel: AppConfig.transactionDescriptionHint,
             kType: TextInputType.text,
           ),
           kTextField(

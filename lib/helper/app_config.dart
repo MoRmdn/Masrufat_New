@@ -65,8 +65,10 @@ class AppConfig {
   static const support = 'Support';
   static const termsAndConditions = 'Terms and Conditions';
 
-  static const transactionName = 'Transaction Info ';
-  static const transactionNameHint = 'Transaction Description';
+  static const transactionName = 'Transaction Name ';
+  static const transactionNameHint = 'Transaction Name';
+  static const transactionDescription = 'Transaction Description ';
+  static const transactionDescriptionHint = 'Transaction Description';
   static const transactionBalance = 'Transaction Balance';
   static const transactionBalanceHint = '500.00';
   static const transactionEditedBalance = 'EditedBalance';

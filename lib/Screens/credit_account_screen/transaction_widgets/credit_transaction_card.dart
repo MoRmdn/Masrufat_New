@@ -8,13 +8,16 @@ import 'package:provider/provider.dart';
 
 import 'add_credit_transaction_bottom_sheet.dart';
 
+// ignore: must_be_immutable
 class CreditTransactionCard extends StatefulWidget {
   final CreditAccount account;
   final Transactions trans;
+  final VoidCallback onRefresh;
   const CreditTransactionCard({
     Key? key,
     required this.trans,
     required this.account,
+    required this.onRefresh,
   }) : super(key: key);
 
   @override
@@ -32,21 +35,26 @@ class _CreditTransactionCardState extends State<CreditTransactionCard> {
 
   void _onRefresh() => setState(() {});
 
-  void _onDeleteTransaction(BuildContext ctx, int index) {
+  void _onDeleteTransaction(int index) {
     customGenericDialog(
-      context: ctx,
+      context: context,
       title: AppConfig.dialogConfirmationTitle,
       content: AppConfig.dialogConfirmationDelete,
       dialogOptions: () => {
         'No': null,
-        'Yes': () => myProvider.deleteTransaction(
-              index: index,
-              creditAccount: widget.account,
-              debitAccount: null,
-            )
+        'Yes': () async => await myProvider
+                .deleteTransaction(
+                  index: index,
+                  creditAccount: widget.account,
+                  debitAccount: null,
+                )
+                .then((value) => Navigator.of(context).pop())
+                .then((value) {
+              widget.onRefresh();
+              _onRefresh();
+            })
       },
     );
-    _onRefresh();
   }
 
   @override
@@ -94,48 +102,53 @@ class _CreditTransactionCardState extends State<CreditTransactionCard> {
           ),
         ),
         if (isExpanded)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Column(
             children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: () => showModalBottomSheet<void>(
-                    isScrollControlled: true,
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).viewInsets.bottom,
-                        ),
-                        child: AddCreditTransactionBottomSheet(
-                          transIndex: index,
-                          isUpdate: true,
-                          account: account,
-                          reFresh: _onRefresh,
-                        ),
-                      );
-                    },
+              Text(transaction.description),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => showModalBottomSheet<void>(
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Padding(
+                            padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).viewInsets.bottom,
+                            ),
+                            child: AddCreditTransactionBottomSheet(
+                              transIndex: index,
+                              isUpdate: true,
+                              account: account,
+                              reFresh: _onRefresh,
+                            ),
+                          );
+                        },
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: const [
+                          Text('edit'),
+                          Icon(Icons.edit),
+                        ],
+                      ),
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [
-                      Text('edit'),
-                      Icon(Icons.edit),
-                    ],
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => _onDeleteTransaction(index),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: const [
+                          Text('delete'),
+                          Icon(Icons.delete),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Expanded(
-                child: TextButton(
-                  onPressed: () => _onDeleteTransaction(context, index),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [
-                      Text('delete'),
-                      Icon(Icons.delete),
-                    ],
-                  ),
-                ),
+                ],
               ),
             ],
           )

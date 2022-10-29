@@ -32,7 +32,6 @@ class AddDebitAccountBottomSheet extends StatefulWidget {
 class _AddDebitAccountBottomSheetState
     extends State<AddDebitAccountBottomSheet> {
   final TextEditingController accNameController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
   final TextEditingController balanceController = TextEditingController();
   SheetMood mood = SheetMood.add;
   final loading = LoadingScreen.instance();
@@ -50,23 +49,21 @@ class _AddDebitAccountBottomSheetState
   @override
   void dispose() {
     accNameController.dispose();
-    descriptionController.dispose();
     balanceController.dispose();
     super.dispose();
   }
 
   void _updateMode() => setState(() {
         accNameController.text = widget.accountToEdit!.name;
-        descriptionController.text = widget.accountToEdit!.description;
-        balanceController.text = widget.accountToEdit!.balance.toString();
+        balanceController.text = myProvider.getTotalDebitBalance.toString();
       });
 
   void _onUpdateAccount() {
     loading.show(context: context, content: AppConfig.pleaseWait);
     final name = accNameController.text;
-    final description = descriptionController.text;
-    final balance = balanceController.text;
-    if (name.isEmpty || balance.isEmpty || description.isEmpty) {
+
+    final balance = double.parse(balanceController.text);
+    if (name.isEmpty) {
       customGenericDialog(
         context: context,
         title: AppConfig.dialogErrorTitle,
@@ -81,56 +78,27 @@ class _AddDebitAccountBottomSheetState
           .then((value) => loading.hide());
       return;
     }
-    final oldBalance = widget.accountToEdit!.balance;
-    if (oldBalance > double.parse(balance)) {
-      final tranNewBalance = oldBalance - double.parse(balance);
-      List<Transactions> transactionList = widget.accountToEdit!.transactions;
-      transactionList.add(
-        Transactions(
-          id: DateTime.now().toIso8601String(),
-          name: 'EditedBalance',
-          isIncome: false,
-          balance: tranNewBalance,
-        ),
-      );
-      widget.accountToEdit = DebitAccount(
-        id: widget.accountToEdit!.id,
-        name: name,
-        description: description,
-        balance: double.parse(
-          balance,
-        ),
-        transactions: transactionList,
-      );
-      myProvider.updateAccount(
-        updatedUserCreditAccount: null,
-        updatedUserDebitAccount: widget.accountToEdit!,
-      );
-    } else {
-      final tranNewBalance = double.parse(balance) - oldBalance;
-      List<Transactions> transactionList = widget.accountToEdit!.transactions;
-      transactionList.add(
-        Transactions(
-          id: DateTime.now().toIso8601String(),
-          name: AppConfig.transactionEditedBalance,
-          isIncome: true,
-          balance: tranNewBalance,
-        ),
-      );
-      widget.accountToEdit = DebitAccount(
-        id: widget.accountToEdit!.id,
-        name: name,
-        description: description,
-        balance: double.parse(
-          balance,
-        ),
-        transactions: transactionList,
-      );
-      myProvider.updateAccount(
-        updatedUserCreditAccount: null,
-        updatedUserDebitAccount: widget.accountToEdit!,
-      );
-    }
+
+    List<Transactions> transactionList = widget.accountToEdit!.transactions;
+    transactionList.add(
+      Transactions(
+        id: DateTime.now().toIso8601String(),
+        name: 'EditedBalance',
+        description: 'EditedBalance',
+        isIncome: false,
+        balance: balance,
+      ),
+    );
+    widget.accountToEdit = DebitAccount(
+      id: widget.accountToEdit!.id,
+      name: name,
+      transactions: transactionList,
+    );
+    myProvider.updateAccount(
+      updatedUserCreditAccount: null,
+      updatedUserDebitAccount: widget.accountToEdit!,
+    );
+    //
 
     widget.onRefresh();
     Future.delayed(const Duration(milliseconds: 500))
@@ -141,7 +109,6 @@ class _AddDebitAccountBottomSheetState
   void _onAddAccount() {
     loading.show(context: context, content: AppConfig.pleaseWait);
     final name = accNameController.text;
-    final description = descriptionController.text;
     final balance = balanceController.text;
     if (name.isEmpty) {
       customGenericDialog(
@@ -159,15 +126,12 @@ class _AddDebitAccountBottomSheetState
     final userDebitAccount = DebitAccount(
       id: DateTime.now().toIso8601String(),
       name: name,
-      description:
-          description.isEmpty ? AppConfig.accountDescriptionHint : description,
-      balance: double.parse(
-        balance.isEmpty ? AppConfig.accountBalanceHint : balance,
-      ),
       transactions: [
         Transactions.initial(
           id: DateTime.now().toIso8601String(),
-          balance: double.parse(balance),
+          balance: double.parse(
+            balance.isEmpty ? '0.0' : balance,
+          ),
         )
       ],
     );
@@ -213,12 +177,6 @@ class _AddDebitAccountBottomSheetState
             textFieldHint: AppConfig.accountNameHint,
             textFieldLabel: AppConfig.accountName,
             kType: TextInputType.name,
-          ),
-          kTextField(
-            controller: descriptionController,
-            textFieldHint: AppConfig.accountDescriptionHint,
-            textFieldLabel: AppConfig.accountDescription,
-            kType: TextInputType.text,
           ),
           kTextField(
             controller: balanceController,

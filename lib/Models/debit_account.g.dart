@@ -18,26 +18,20 @@ class DebitAccountAdapter extends TypeAdapter<DebitAccount> {
     };
     return DebitAccount(
       id: fields[0] as String,
-      transactions: (fields[4] as List).cast<Transactions>(),
+      transactions: (fields[2] as List).cast<Transactions>(),
       name: fields[1] as String,
-      description: fields[2] as String,
-      balance: fields[3] as double,
     );
   }
 
   @override
   void write(BinaryWriter writer, DebitAccount obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.description)
-      ..writeByte(3)
-      ..write(obj.balance)
-      ..writeByte(4)
       ..write(obj.transactions);
   }
 
