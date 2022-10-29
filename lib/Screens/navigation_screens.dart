@@ -84,7 +84,7 @@ class _NavigationScreenState extends State<NavigationScreen>
   }
 
   Future<void> fetchData() async {
-    Future.delayed(const Duration(microseconds: 500)).then((value) {
+    Future.delayed(const Duration(microseconds: 0)).then((value) {
       creditAccount = myProvider.getUserCreditAccounts;
       debitAccount = myProvider.getUserDebitAccounts;
       expensesThisMonth = myProvider.getUserExpensesPerMonth;

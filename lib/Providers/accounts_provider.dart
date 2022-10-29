@@ -20,21 +20,21 @@ class AccountsProvider with ChangeNotifier {
       Hive.box<DebitAccount>(AppConfig.dataBaseBoxForDebit);
   List<CreditAccount> _userCreditAccounts = [];
   List<DebitAccount> _userDebitAccounts = [];
-  final List<Transactions> _expensesTransaction = [];
-  final List<Transactions> _expensesPerMonthTransaction = [];
+  List<Transactions> _expensesTransaction = [];
+  List<Transactions> _expensesThisMonthTransaction = [];
   //? debit + credit Balance
   double _grandTotalBalance = 0.0;
   double _totalCreditBalance = 0.0;
   double _totalDebitBalance = 0.0;
   double _totalExpenses = 0.0;
-  double _totalPerMonthExpenses = 0.0;
+  double _totalThisMonthExpenses = 0.0;
 
   Future<void> fetchDataBaseBox() async {
     _userCreditAccounts =
         _dataBaseBoxForCredit.values.toList().cast<CreditAccount>();
     _userDebitAccounts =
         _dataBaseBoxForDebit.values.toList().cast<DebitAccount>();
-    _userExpenses();
+    _userCreditExpenses();
     fetchBalance();
     log('this is your Credit Accounts $_userCreditAccounts');
     log('this is your Debit Accounts $_userDebitAccounts');
@@ -141,6 +141,9 @@ class AccountsProvider with ChangeNotifier {
       _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
       _dataBaseBoxForDebit.put(existDebitAccount.id, existDebitAccount);
     }
+    if (!newTransaction.isIncome) {
+      _userCreditExpenses();
+    }
     _grandTotalBalance = _totalCreditBalance + _totalDebitBalance;
     notifyListeners();
   }
@@ -166,6 +169,9 @@ class AccountsProvider with ChangeNotifier {
       fetchDebitBalance();
       //? save New Updated Account to DataBase
       _dataBaseBoxForDebit.put(debitAccount.id, debitAccount);
+    }
+    if (!newTransaction.isIncome) {
+      _userCreditExpenses();
     }
     notifyListeners();
   }
@@ -228,21 +234,29 @@ class AccountsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _userExpenses() async {
+  Future<void> _userCreditExpenses() async {
+    List<Transactions> expensesNew = [];
+    List<Transactions> expensesNewThisMonth = [];
+    double expensesTotal = 0;
+    double expensesThisMonth = 0;
     for (var element in _userCreditAccounts) {
       for (var element in element.transactions) {
-        if (element.isIncome == false) {
-          _totalExpenses += element.balance;
-          _expensesTransaction.add(element);
+        if (!element.isIncome) {
+          expensesTotal += element.balance;
+          expensesNew.add(element);
           DateTime date = DateTime.parse(element.id);
           //* check if this transaction happen this month or not
           if (date.month == DateTime.now().month) {
-            _totalPerMonthExpenses += element.balance;
-            _expensesPerMonthTransaction.add(element);
+            expensesThisMonth += element.balance;
+            expensesNewThisMonth.add(element);
           }
         }
       }
     }
+    _totalExpenses = expensesTotal;
+    _totalThisMonthExpenses = expensesThisMonth;
+    _expensesTransaction = expensesNew;
+    _expensesThisMonthTransaction = expensesNewThisMonth;
     notifyListeners();
   }
 
@@ -251,9 +265,9 @@ class AccountsProvider with ChangeNotifier {
     _totalCreditBalance = 0.0;
     _totalDebitBalance = 0.0;
     _totalExpenses = 0.0;
-    _totalPerMonthExpenses = 0.0;
-    _expensesTransaction.clear();
-    _expensesPerMonthTransaction.clear();
+    _totalThisMonthExpenses = 0.0;
+    _expensesTransaction = [];
+    _expensesThisMonthTransaction = [];
     _userCreditAccounts = [];
     _userDebitAccounts = [];
     _dataBaseBoxForCredit.deleteFromDisk();
@@ -269,9 +283,9 @@ class AccountsProvider with ChangeNotifier {
   List<DebitAccount> get getUserDebitAccounts => _userDebitAccounts;
   List<Transactions> get getUserExpenses => _expensesTransaction;
   List<Transactions> get getUserExpensesPerMonth =>
-      _expensesPerMonthTransaction;
+      _expensesThisMonthTransaction;
   double get getTotalExpenses => _totalExpenses;
-  double get getTotalPerMonthExpenses => _totalPerMonthExpenses;
+  double get getTotalPerMonthExpenses => _totalThisMonthExpenses;
 
   double get getTotalGrandBalance => _grandTotalBalance;
   double get getTotalCreditBalance => _totalCreditBalance;
