@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:masrufat/Models/credit_account.dart';
-import 'package:masrufat/Models/debit_account.dart';
+import 'package:masrufat/Models/accounts.dart';
 import 'package:masrufat/Models/transaction.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';

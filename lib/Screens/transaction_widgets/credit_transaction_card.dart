@@ -1,29 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:masrufat/Models/debit_account.dart';
+import 'package:masrufat/Models/accounts.dart';
 import 'package:masrufat/Models/transaction.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
 import 'package:masrufat/dialog/custom_generic_dialog.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import 'add_debit_transaction_bottom_sheet.dart';
+import 'add_credit_transaction_bottom_sheet.dart';
 
-class DebitTransactionCard extends StatefulWidget {
-  final DebitAccount account;
+// ignore: must_be_immutable
+class TransactionCard extends StatefulWidget {
+  final CreditAccount? crAccount;
+  final DebitAccount? drAccount;
+  final AccountType type;
   final Transactions trans;
   final VoidCallback onRefresh;
-  const DebitTransactionCard({
+  const TransactionCard({
     Key? key,
     required this.trans,
-    required this.account,
     required this.onRefresh,
+    required this.crAccount,
+    required this.drAccount,
+    required this.type,
   }) : super(key: key);
 
   @override
-  State<DebitTransactionCard> createState() => _DebitTransactionCardState();
+  State<TransactionCard> createState() => _TransactionCardState();
 }
 
-class _DebitTransactionCardState extends State<DebitTransactionCard> {
+class _TransactionCardState extends State<TransactionCard> {
   bool isExpanded = false;
   late AccountsProvider myProvider;
   @override
@@ -35,17 +40,19 @@ class _DebitTransactionCardState extends State<DebitTransactionCard> {
   void _onRefresh() => setState(() {});
 
   void _onDeleteTransaction(int index) {
+    final crAccount = widget.crAccount;
+    final drAccount = widget.drAccount;
     customGenericDialog(
       context: context,
       title: AppConfig.dialogConfirmationTitle,
       content: AppConfig.dialogConfirmationDelete,
       dialogOptions: () => {
         'No': null,
-        'Yes': () => myProvider
+        'Yes': () async => await myProvider
                 .deleteTransaction(
                   index: index,
-                  debitAccount: widget.account,
-                  creditAccount: null,
+                  creditAccount: crAccount,
+                  debitAccount: drAccount,
                 )
                 .then((value) => Navigator.of(context).pop())
                 .then((value) {
@@ -54,15 +61,22 @@ class _DebitTransactionCardState extends State<DebitTransactionCard> {
             })
       },
     );
-    _onRefresh();
   }
 
   @override
   Widget build(BuildContext context) {
+    int index;
     final transaction = widget.trans;
-    final account = widget.account;
-    final index = account.transactions
-        .indexWhere((element) => element.id == transaction.id);
+    final crAccount = widget.crAccount;
+    final drAccount = widget.drAccount;
+    final _type = widget.type;
+    if (_type == AccountType.credit) {
+      index = crAccount!.transactions
+          .indexWhere((element) => element.id == transaction.id);
+    } else {
+      index = drAccount!.transactions
+          .indexWhere((element) => element.id == transaction.id);
+    }
     final incomeStyle = TextStyle(
       color: transaction.isIncome ? Colors.black : Colors.white,
     );
@@ -103,7 +117,6 @@ class _DebitTransactionCardState extends State<DebitTransactionCard> {
         ),
         if (isExpanded)
           Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
               Text(transaction.description),
               Row(
@@ -119,11 +132,13 @@ class _DebitTransactionCardState extends State<DebitTransactionCard> {
                             padding: EdgeInsets.only(
                               bottom: MediaQuery.of(context).viewInsets.bottom,
                             ),
-                            child: AddDebitTransactionBottomSheet(
+                            child: AddTransactionBottomSheet(
                               transIndex: index,
                               isUpdate: true,
-                              account: account,
                               reFresh: _onRefresh,
+                              crAccount: crAccount,
+                              drAccount: drAccount,
+                              type: _type,
                             ),
                           );
                         },

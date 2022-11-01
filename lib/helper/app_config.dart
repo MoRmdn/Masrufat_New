@@ -6,6 +6,11 @@ enum LoginErrorHandler {
   invalidData,
 }
 
+enum AccountType {
+  debit,
+  credit,
+}
+
 enum AuthPageController {
   loginPage,
   signUpPage,

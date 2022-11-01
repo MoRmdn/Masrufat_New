@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:masrufat/Models/credit_account.dart';
+import 'package:masrufat/Models/accounts.dart';
 import 'package:masrufat/Models/transaction.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
 import 'package:masrufat/dialog/custom_generic_dialog.dart';
@@ -15,30 +15,32 @@ enum TansMood {
 }
 
 // ignore: must_be_immutable
-class AddCreditTransactionBottomSheet extends StatefulWidget {
-  final CreditAccount account;
-  VoidCallback reFresh;
+class AddTransactionBottomSheet extends StatefulWidget {
+  final CreditAccount? crAccount;
+  final DebitAccount? drAccount;
+  final AccountType type;
+  final VoidCallback reFresh;
   final int? transIndex;
   final bool? isUpdate;
-  AddCreditTransactionBottomSheet({
+  const AddTransactionBottomSheet({
     Key? key,
-    required this.account,
     required this.reFresh,
     this.isUpdate,
     this.transIndex,
+    required this.crAccount,
+    required this.drAccount,
+    required this.type,
   }) : super(key: key);
 
   @override
-  State<AddCreditTransactionBottomSheet> createState() =>
-      _AddCreditTransactionBottomSheetState();
+  State<AddTransactionBottomSheet> createState() =>
+      _AddTransactionBottomSheetState();
 }
 
-class _AddCreditTransactionBottomSheetState
-    extends State<AddCreditTransactionBottomSheet> {
+class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
   final transactionNameController = TextEditingController();
   final descriptionController = TextEditingController();
   final balanceController = TextEditingController();
-
   String timeAsID = DateTime.now().toIso8601String();
   late AccountsProvider myProvider;
   bool switchValue = false;
@@ -70,14 +72,25 @@ class _AddCreditTransactionBottomSheetState
       });
 
   void _updateMode() => setState(() {
+        final type = widget.type;
         final index = widget.transIndex!;
-        transactionNameController.text =
-            widget.account.transactions[index].name;
-        balanceController.text =
-            widget.account.transactions[index].balance.toString();
-        descriptionController.text =
-            widget.account.transactions[index].description;
-        switchValue = widget.account.transactions[index].isIncome;
+        final crAccount = widget.crAccount;
+        final drAccount = widget.drAccount;
+        if (type == AccountType.credit) {
+          transactionNameController.text = crAccount!.transactions[index].name;
+          balanceController.text =
+              crAccount.transactions[index].balance.toString();
+          descriptionController.text =
+              crAccount.transactions[index].description;
+          switchValue = crAccount.transactions[index].isIncome;
+        } else {
+          transactionNameController.text = drAccount!.transactions[index].name;
+          balanceController.text =
+              drAccount.transactions[index].balance.toString();
+          descriptionController.text =
+              drAccount.transactions[index].description;
+          switchValue = drAccount.transactions[index].isIncome;
+        }
       });
 
   void _onUpdateTransaction() {
@@ -98,34 +111,67 @@ class _AddCreditTransactionBottomSheetState
       );
       return;
     }
+    final type = widget.type;
     final index = widget.transIndex!;
+    final crAccount = widget.crAccount;
+    final drAccount = widget.drAccount;
 
-    if (switchValue) {
-      final newTrans = Transactions(
-        id: widget.account.transactions[index].id,
-        name: name,
-        description: description,
-        isIncome: switchValue,
-        balance: double.parse(balance),
-      );
-      myProvider.updateTransaction(
-        newTransaction: newTrans,
-        creditAccount: widget.account,
-        debitAccount: null,
-      );
+    if (type == AccountType.credit) {
+      if (switchValue) {
+        final newTrans = Transactions(
+          id: crAccount!.transactions[index].id,
+          name: name,
+          description: description,
+          isIncome: switchValue,
+          balance: double.parse(balance),
+        );
+        myProvider.updateTransaction(
+          newTransaction: newTrans,
+          creditAccount: crAccount,
+          debitAccount: null,
+        );
+      } else {
+        final newTrans = Transactions(
+          id: crAccount!.transactions[index].id,
+          name: name,
+          description: description,
+          isIncome: switchValue,
+          balance: -double.parse(balance),
+        );
+        myProvider.updateTransaction(
+          creditAccount: crAccount,
+          newTransaction: newTrans,
+          debitAccount: null,
+        );
+      }
     } else {
-      final newTrans = Transactions(
-        id: widget.account.transactions[index].id,
-        name: name,
-        description: description,
-        isIncome: switchValue,
-        balance: -double.parse(balance),
-      );
-      myProvider.updateTransaction(
-        creditAccount: widget.account,
-        newTransaction: newTrans,
-        debitAccount: null,
-      );
+      if (switchValue) {
+        final newTrans = Transactions(
+          id: drAccount!.transactions[index].id,
+          name: name,
+          description: description,
+          isIncome: switchValue,
+          balance: double.parse(balance),
+        );
+        myProvider.updateTransaction(
+          creditAccount: null,
+          newTransaction: newTrans,
+          debitAccount: drAccount,
+        );
+      } else {
+        final newTrans = Transactions(
+          id: drAccount!.transactions[index].id,
+          name: name,
+          description: description,
+          isIncome: switchValue,
+          balance: -double.parse(balance),
+        );
+        myProvider.updateTransaction(
+          creditAccount: null,
+          newTransaction: newTrans,
+          debitAccount: drAccount,
+        );
+      }
     }
 
     widget.reFresh();
@@ -135,6 +181,10 @@ class _AddCreditTransactionBottomSheetState
   }
 
   void _onAddTransaction() {
+    final type = widget.type;
+
+    final crAccount = widget.crAccount;
+    final drAccount = widget.drAccount;
     loading.show(context: context, content: AppConfig.pleaseWait);
     final description = descriptionController.text;
     final transactionName = transactionNameController.text;
@@ -155,32 +205,62 @@ class _AddCreditTransactionBottomSheetState
       return;
     }
 
-    if (switchValue) {
-      final newTrans = Transactions(
-        id: timeAsID,
-        name: transactionName,
-        description: description,
-        isIncome: switchValue,
-        balance: double.parse(transactionBalance),
-      );
-      myProvider.addTransaction(
-        existCreditAccount: widget.account,
-        newTransaction: newTrans,
-        existDebitAccount: null,
-      );
+    if (type == AccountType.credit) {
+      if (switchValue) {
+        final newTrans = Transactions(
+          id: timeAsID,
+          name: transactionName,
+          description: description,
+          isIncome: switchValue,
+          balance: double.parse(transactionBalance),
+        );
+        myProvider.addTransaction(
+          existCreditAccount: crAccount,
+          newTransaction: newTrans,
+          existDebitAccount: null,
+        );
+      } else {
+        final newTrans = Transactions(
+          id: timeAsID,
+          description: description,
+          name: transactionName,
+          isIncome: switchValue,
+          balance: -double.parse(transactionBalance),
+        );
+        myProvider.addTransaction(
+          existCreditAccount: crAccount,
+          newTransaction: newTrans,
+          existDebitAccount: null,
+        );
+      }
     } else {
-      final newTrans = Transactions(
-        id: timeAsID,
-        description: description,
-        name: transactionName,
-        isIncome: switchValue,
-        balance: -double.parse(transactionBalance),
-      );
-      myProvider.addTransaction(
-        existCreditAccount: widget.account,
-        newTransaction: newTrans,
-        existDebitAccount: null,
-      );
+      if (switchValue) {
+        final newTrans = Transactions(
+          id: timeAsID,
+          name: transactionName,
+          description: description,
+          isIncome: switchValue,
+          balance: double.parse(transactionBalance),
+        );
+        myProvider.addTransaction(
+          existCreditAccount: null,
+          newTransaction: newTrans,
+          existDebitAccount: drAccount,
+        );
+      } else {
+        final newTrans = Transactions(
+          id: timeAsID,
+          description: description,
+          name: transactionName,
+          isIncome: switchValue,
+          balance: -double.parse(transactionBalance),
+        );
+        myProvider.addTransaction(
+          existCreditAccount: null,
+          newTransaction: newTrans,
+          existDebitAccount: drAccount,
+        );
+      }
     }
 
     widget.reFresh();
@@ -191,6 +271,7 @@ class _AddCreditTransactionBottomSheetState
 
   @override
   Widget build(BuildContext context) {
+    final type = widget.type;
     final dSize = MediaQuery.of(context).size;
     return Container(
       constraints: BoxConstraints(

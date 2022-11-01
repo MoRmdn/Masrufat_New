@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/transaction.dart';
+import 'package:provider/provider.dart';
 
-class Expenses extends StatelessWidget {
+import '../../Providers/accounts_provider.dart';
+import '../../helper/app_config.dart';
+
+class Expenses extends StatefulWidget {
   final List<Transactions> expenses;
   final List<Transactions> expensesThisMonth;
   final double totalExpenses;
@@ -15,61 +19,142 @@ class Expenses extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<Expenses> createState() => _ExpensesState();
+}
+
+class _ExpensesState extends State<Expenses> with TickerProviderStateMixin {
+  bool isExpanded = false;
+  late AnimationController _animationController;
+  late Animation<Size> _hightController;
+  late AccountsProvider myProvider;
+  @override
+  void initState() {
+    myProvider = Provider.of(context, listen: false);
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _hightController = Tween<Size>(
+      begin: const Size(double.infinity, 0),
+      end: const Size(double.infinity, 50),
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.linear,
+      ),
+    );
+    _animationController.addListener(() => setState(() {}));
+    _animationController.forward();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          SizedBox(
-            height: 100,
-            child: Card(
-              elevation: 6,
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        'This Month Expenses',
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
+    const style = TextStyle(color: Colors.white, fontSize: 20);
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
+      child: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            isExpanded = !isExpanded;
+            !isExpanded
+                ? _animationController.reverse()
+                : _animationController.forward();
+          });
+        },
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: const BoxDecoration(
+                      color: AppConfig.primaryColor,
+                      borderRadius:
+                          BorderRadius.vertical(bottom: Radius.circular(20)),
                     ),
-                    Expanded(
-                      child: Text(
-                        '$totalExpensesThisMonth \$',
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
+                    constraints: BoxConstraints(
+                      maxHeight: _hightController.value.height,
+                      minHeight: _hightController.value.height,
                     ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: expensesThisMonth
-                .map(
-                  (trans) => Container(
-                    margin: const EdgeInsets.all(10),
-                    color: Colors.red,
-                    child: ListTile(
-                      textColor: Colors.white,
-                      title: Text(
-                        trans.name,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Expanded(
+                          flex: 3,
+                          child: Text(
+                            'This Month Expenses',
+                            style: style,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            '${widget.totalExpensesThisMonth} \$',
+                            style: style,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(50),
                       ),
-                      subtitle: Text(
-                        trans.id,
-                      ),
-                      leading: Text(
-                        trans.balance.toString(),
+                      child: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            isExpanded = !isExpanded;
+                            !isExpanded
+                                ? _animationController.reverse()
+                                : _animationController.forward();
+                          });
+                        },
+                        icon: const Icon(
+                          Icons.keyboard_arrow_up_rounded,
+                        ),
                       ),
                     ),
                   ),
-                )
-                .toList(),
+                ],
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: widget.expensesThisMonth
+                    .map(
+                      (trans) => Container(
+                        margin: const EdgeInsets.all(10),
+                        color: Colors.red,
+                        child: ListTile(
+                          textColor: Colors.white,
+                          title: Text(
+                            trans.name,
+                          ),
+                          subtitle: Text(
+                            trans.id,
+                          ),
+                          leading: Text(
+                            trans.balance.toString(),
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

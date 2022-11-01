@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 part 'transaction.g.dart';
 
-@HiveType(typeId: 2)
+@HiveType(typeId: 3)
 class Transactions extends HiveObject {
   @HiveField(0)
   final String id;
@@ -16,6 +16,8 @@ class Transactions extends HiveObject {
   final String description;
   @HiveField(5)
   String? transferTo;
+  @HiveField(6)
+  String? transferFrom;
 
   Transactions({
     required this.id,

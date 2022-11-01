@@ -1,39 +1,43 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:masrufat/Models/debit_account.dart';
+import 'package:masrufat/Models/accounts.dart';
+import 'package:masrufat/Providers/accounts_provider.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import '../Providers/accounts_provider.dart';
-import 'debit_account_screen/transaction_widgets/add_debit_transaction_bottom_sheet.dart';
-import 'debit_account_screen/transaction_widgets/debit_transaction_card.dart';
+import 'transaction_widgets/add_credit_transaction_bottom_sheet.dart';
+import 'transaction_widgets/credit_transaction_card.dart';
 
-class DebitAccountScreen extends StatefulWidget {
-  final DebitAccount account;
+class AccountScreen extends StatefulWidget {
+  final CreditAccount? crAccount;
+  final DebitAccount? drAccount;
+  final AccountType type;
   final VoidCallback onRefresh;
-  const DebitAccountScreen({
+  const AccountScreen({
     Key? key,
-    required this.account,
     required this.onRefresh,
+    required this.type,
+    this.crAccount,
+    this.drAccount,
   }) : super(key: key);
 
   @override
-  State<DebitAccountScreen> createState() => _DebitAccountScreenState();
+  State<AccountScreen> createState() => _AccountScreenState();
 }
 
-class _DebitAccountScreenState extends State<DebitAccountScreen> {
+class _AccountScreenState extends State<AccountScreen> {
   late AccountsProvider myProvider;
 
   bool isExpanded = false;
-
-  void _onRefresh() => setState(() {});
 
   @override
   void didChangeDependencies() {
     myProvider = Provider.of<AccountsProvider>(context, listen: false);
     super.didChangeDependencies();
   }
+
+  void _onRefresh() => setState(() {});
 
   Widget accountInfo({
     required double hight,
@@ -64,15 +68,19 @@ class _DebitAccountScreenState extends State<DebitAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    log('DebitAccountScreen');
+    log('AccountScreen');
+    final crAccount = widget.crAccount;
+    final drAccount = widget.drAccount;
+    final _type = widget.type;
     final dSize = MediaQuery.of(context).size;
     const style = TextStyle(color: Colors.white, fontSize: 20);
-
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         foregroundColor: AppConfig.secondaryColor,
-        title: Text(widget.account.name),
+        title: Text(
+          _type == AccountType.credit ? crAccount!.name : drAccount!.name,
+        ),
         actions: [
           IconButton(
             onPressed: () => showModalBottomSheet<void>(
@@ -83,9 +91,11 @@ class _DebitAccountScreenState extends State<DebitAccountScreen> {
                   padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).viewInsets.bottom,
                   ),
-                  child: AddDebitTransactionBottomSheet(
-                    account: widget.account,
+                  child: AddTransactionBottomSheet(
                     reFresh: _onRefresh,
+                    crAccount: crAccount,
+                    drAccount: drAccount,
+                    type: _type,
                   ),
                 );
               },
@@ -98,14 +108,14 @@ class _DebitAccountScreenState extends State<DebitAccountScreen> {
         child: Column(
           children: [
             Container(
+              constraints: BoxConstraints(
+                maxHeight: dSize.height * 0.2,
+                minHeight: dSize.height * 0.1,
+              ),
               decoration: const BoxDecoration(
                 color: AppConfig.primaryColor,
                 borderRadius:
                     BorderRadius.vertical(bottom: Radius.circular(20)),
-              ),
-              constraints: BoxConstraints(
-                maxHeight: dSize.height * 0.2,
-                minHeight: dSize.height * 0.1,
               ),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -115,13 +125,17 @@ class _DebitAccountScreenState extends State<DebitAccountScreen> {
                     accountInfo(
                       hight: 50,
                       title: AppConfig.accountName + ':',
-                      value: widget.account.name,
+                      value: _type == AccountType.credit
+                          ? crAccount!.name
+                          : drAccount!.name,
                       style: style,
                     ),
                     accountInfo(
                       hight: 50,
                       title: AppConfig.accountBalance + ':',
-                      value: myProvider.getTotalDebitBalance.toString(),
+                      value: _type == AccountType.credit
+                          ? myProvider.getTotalCreditBalance.toString()
+                          : myProvider.getTotalDebitBalance.toString(),
                       style: style,
                     ),
                   ],
@@ -132,18 +146,35 @@ class _DebitAccountScreenState extends State<DebitAccountScreen> {
               height: 20,
             ),
             Column(
-              children: widget.account.transactions
-                  .map(
-                    (element) => DebitTransactionCard(
-                      trans: element,
-                      account: widget.account,
-                      onRefresh: () {
-                        widget.onRefresh();
-                        _onRefresh();
-                      },
-                    ),
-                  )
-                  .toList(),
+              children: _type == AccountType.credit
+                  ? crAccount!.transactions
+                      .map(
+                        (element) => TransactionCard(
+                          trans: element,
+                          crAccount: crAccount,
+                          drAccount: drAccount,
+                          type: _type,
+                          onRefresh: () {
+                            widget.onRefresh();
+                            _onRefresh();
+                          },
+                        ),
+                      )
+                      .toList()
+                  : drAccount!.transactions
+                      .map(
+                        (element) => TransactionCard(
+                          trans: element,
+                          crAccount: crAccount,
+                          drAccount: drAccount,
+                          type: _type,
+                          onRefresh: () {
+                            widget.onRefresh();
+                            _onRefresh();
+                          },
+                        ),
+                      )
+                      .toList(),
             )
           ],
         ),

@@ -2,16 +2,10 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:masrufat/Models/credit_account.dart';
-import 'package:masrufat/Models/debit_account.dart';
+import 'package:masrufat/Models/accounts.dart';
 import 'package:masrufat/Models/transaction.dart';
 
 import '../helper/app_config.dart';
-
-enum AccountType {
-  credit,
-  debit,
-}
 
 class AccountsProvider with ChangeNotifier {
   final Box<CreditAccount> _dataBaseBoxForCredit =
@@ -102,8 +96,8 @@ class AccountsProvider with ChangeNotifier {
   }
 
   Future<void> deleteAccount({
-    required CreditAccount? deleteUserCreditAccount,
-    required DebitAccount? deleteUserDebitAccount,
+    CreditAccount? deleteUserCreditAccount,
+    DebitAccount? deleteUserDebitAccount,
   }) async {
     if (deleteUserCreditAccount != null) {
       _userCreditAccounts.remove(deleteUserCreditAccount);

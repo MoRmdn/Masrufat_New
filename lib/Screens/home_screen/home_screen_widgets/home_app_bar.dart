@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../helper/app_config.dart';
-import '../../credit_account_screen/account_widgets/add_credit_account_bottom_sheet.dart';
-import '../../debit_account_screen/account_widgets/add_debit_account_bottom_sheet.dart';
+import '../../account_widgets/add_credit_account_bottom_sheet.dart';
 
 AppBar getAppBar({
   required BuildContext context,
@@ -24,8 +23,9 @@ AppBar getAppBar({
                 padding: EdgeInsets.only(
                   bottom: MediaQuery.of(context).viewInsets.bottom,
                 ),
-                child: AddCreditAccountBottomSheet(
+                child: AddAccountBottomSheet(
                   onRefresh: () => onRefresh(),
+                  type: AccountType.credit,
                 ),
               );
             },
@@ -49,8 +49,9 @@ AppBar getAppBar({
                 padding: EdgeInsets.only(
                   bottom: MediaQuery.of(context).viewInsets.bottom,
                 ),
-                child: AddDebitAccountBottomSheet(
+                child: AddAccountBottomSheet(
                   onRefresh: () => onRefresh(),
+                  type: AccountType.debit,
                 ),
               );
             },
@@ -61,6 +62,7 @@ AppBar getAppBar({
     );
   } else if (bottomNavIndex == 2) {
     return AppBar(
+      elevation: 0,
       foregroundColor: AppConfig.secondaryColor,
       title: const Text(AppConfig.expenses),
     );
