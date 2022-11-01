@@ -81,6 +81,8 @@ class _NavigationScreenState extends State<NavigationScreen>
     super.dispose();
   }
 
+  void _onRefresh() => setState(() {});
+
   Future<void> fetchData() async {
     Future.delayed(const Duration(microseconds: 0)).then((value) {
       creditAccount = myProvider.getUserCreditAccounts;
@@ -98,12 +100,14 @@ class _NavigationScreenState extends State<NavigationScreen>
     fetchData();
     return creditAccount.isNotEmpty && widget.index == 0
         ? AccountCards(
+            onRefresh: _onRefresh,
             creditAccounts: creditAccount,
             debitAccounts: debitAccount,
             type: AccountType.credit,
           )
         : debitAccount.isNotEmpty && widget.index == 1
             ? AccountCards(
+                onRefresh: _onRefresh,
                 creditAccounts: creditAccount,
                 debitAccounts: debitAccount,
                 type: AccountType.debit,

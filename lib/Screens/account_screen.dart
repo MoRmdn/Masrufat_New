@@ -6,8 +6,8 @@ import 'package:masrufat/Providers/accounts_provider.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import 'transaction_widgets/add_credit_transaction_bottom_sheet.dart';
-import 'transaction_widgets/credit_transaction_card.dart';
+import 'transaction_widgets/add_transaction_bottom_sheet.dart';
+import 'transaction_widgets/transaction_card.dart';
 
 class AccountScreen extends StatefulWidget {
   final CreditAccount? crAccount;

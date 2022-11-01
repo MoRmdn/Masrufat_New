@@ -6,7 +6,7 @@ import 'package:masrufat/dialog/custom_generic_dialog.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
-import 'add_credit_transaction_bottom_sheet.dart';
+import 'add_transaction_bottom_sheet.dart';
 
 // ignore: must_be_immutable
 class TransactionCard extends StatefulWidget {
@@ -37,7 +37,9 @@ class _TransactionCardState extends State<TransactionCard> {
     super.initState();
   }
 
-  void _onRefresh() => setState(() {});
+  void _onRefresh() => setState(() {
+        widget.onRefresh();
+      });
 
   void _onDeleteTransaction(int index) {
     final crAccount = widget.crAccount;

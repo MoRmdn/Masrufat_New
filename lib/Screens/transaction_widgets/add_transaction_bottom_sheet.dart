@@ -14,7 +14,6 @@ enum TansMood {
   update,
 }
 
-// ignore: must_be_immutable
 class AddTransactionBottomSheet extends StatefulWidget {
   final CreditAccount? crAccount;
   final DebitAccount? drAccount;
@@ -79,14 +78,14 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         if (type == AccountType.credit) {
           transactionNameController.text = crAccount!.transactions[index].name;
           balanceController.text =
-              crAccount.transactions[index].balance.toString();
+              crAccount.transactions[index].balance.abs().toString();
           descriptionController.text =
               crAccount.transactions[index].description;
           switchValue = crAccount.transactions[index].isIncome;
         } else {
           transactionNameController.text = drAccount!.transactions[index].name;
           balanceController.text =
-              drAccount.transactions[index].balance.toString();
+              drAccount.transactions[index].balance.abs().toString();
           descriptionController.text =
               drAccount.transactions[index].description;
           switchValue = drAccount.transactions[index].isIncome;
@@ -173,7 +172,6 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         );
       }
     }
-
     widget.reFresh();
     Future.delayed(const Duration(milliseconds: 500))
         .then((value) => loading.hide());
@@ -262,7 +260,6 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         );
       }
     }
-
     widget.reFresh();
     Future.delayed(const Duration(milliseconds: 500))
         .then((value) => loading.hide());

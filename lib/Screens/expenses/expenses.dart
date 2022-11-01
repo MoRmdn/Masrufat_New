@@ -36,7 +36,7 @@ class _ExpensesState extends State<Expenses> with TickerProviderStateMixin {
     );
     _hightController = Tween<Size>(
       begin: const Size(double.infinity, 0),
-      end: const Size(double.infinity, 50),
+      end: const Size(double.infinity, 70),
     ).animate(
       CurvedAnimation(
         parent: _animationController,

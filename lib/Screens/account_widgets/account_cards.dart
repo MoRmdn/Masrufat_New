@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/accounts.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
@@ -13,11 +15,13 @@ class AccountCards extends StatefulWidget {
   final List<CreditAccount>? creditAccounts;
   final List<DebitAccount>? debitAccounts;
   final AccountType type;
+  final VoidCallback onRefresh;
   const AccountCards({
     Key? key,
     required this.type,
     required this.creditAccounts,
     required this.debitAccounts,
+    required this.onRefresh,
   }) : super(key: key);
 
   @override
@@ -40,7 +44,7 @@ class _AccountCardsState extends State<AccountCards>
     );
     _hightController = Tween<Size>(
       begin: const Size(double.infinity, 0),
-      end: Size(double.infinity, widget.type == AccountType.credit ? 70 : 50),
+      end: const Size(double.infinity, 70),
     ).animate(
       CurvedAnimation(
         parent: _animationController,
@@ -53,17 +57,14 @@ class _AccountCardsState extends State<AccountCards>
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
   }
 
-  void _onRefresh() => setState(() {});
+  void _onRefresh() => setState(() {
+        widget.onRefresh();
+      });
 
   Future<bool?> _onDismiss() => customGenericDialog(
         context: context,
@@ -77,6 +78,7 @@ class _AccountCardsState extends State<AccountCards>
 
   @override
   Widget build(BuildContext context) {
+    log('Account_Card');
     final creditAccounts = widget.creditAccounts;
     final debitAccounts = widget.debitAccounts;
     final _type = widget.type;
