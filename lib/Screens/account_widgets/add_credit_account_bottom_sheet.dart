@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:masrufat/Models/debit_account.dart';
 import 'package:provider/provider.dart';
 
+import '../../../Models/accounts.dart';
 import '../../../Models/transaction.dart';
 import '../../../Providers/accounts_provider.dart';
 import '../../../Widgets/custom_text_field.dart';
@@ -15,24 +15,27 @@ enum SheetMood {
 }
 
 // ignore: must_be_immutable
-class AddDebitAccountBottomSheet extends StatefulWidget {
+class AddAccountBottomSheet extends StatefulWidget {
   final VoidCallback onRefresh;
-  DebitAccount? accountToEdit;
-  AddDebitAccountBottomSheet({
+  final CreditAccount? crAccountToEdit;
+  final DebitAccount? drAccountToEdit;
+  final AccountType type;
+  const AddAccountBottomSheet({
     Key? key,
     required this.onRefresh,
-    this.accountToEdit,
+    required this.type,
+    this.crAccountToEdit,
+    this.drAccountToEdit,
   }) : super(key: key);
 
   @override
-  State<AddDebitAccountBottomSheet> createState() =>
-      _AddDebitAccountBottomSheetState();
+  State<AddAccountBottomSheet> createState() => _AddAccountBottomSheetState();
 }
 
-class _AddDebitAccountBottomSheetState
-    extends State<AddDebitAccountBottomSheet> {
+class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
   final TextEditingController accNameController = TextEditingController();
   final TextEditingController balanceController = TextEditingController();
+
   SheetMood mood = SheetMood.add;
   final loading = LoadingScreen.instance();
   late Size dSize;
@@ -54,15 +57,18 @@ class _AddDebitAccountBottomSheetState
   }
 
   void _updateMode() => setState(() {
-        accNameController.text = widget.accountToEdit!.name;
-        balanceController.text = myProvider.getTotalDebitBalance.toString();
+        final crAccount = widget.crAccountToEdit;
+        final drAccount = widget.drAccountToEdit;
+        if (widget.type == AccountType.credit) {
+          accNameController.text = crAccount!.name;
+        } else {
+          accNameController.text = drAccount!.name;
+        }
       });
 
   void _onUpdateAccount() {
     loading.show(context: context, content: AppConfig.pleaseWait);
     final name = accNameController.text;
-
-    final balance = double.parse(balanceController.text);
     if (name.isEmpty) {
       customGenericDialog(
         context: context,
@@ -79,26 +85,29 @@ class _AddDebitAccountBottomSheetState
       return;
     }
 
-    List<Transactions> transactionList = widget.accountToEdit!.transactions;
-    transactionList.add(
-      Transactions(
-        id: DateTime.now().toIso8601String(),
-        name: 'EditedBalance',
-        description: 'EditedBalance',
-        isIncome: false,
-        balance: balance,
-      ),
-    );
-    widget.accountToEdit = DebitAccount(
-      id: widget.accountToEdit!.id,
-      name: name,
-      transactions: transactionList,
-    );
-    myProvider.updateAccount(
-      updatedUserCreditAccount: null,
-      updatedUserDebitAccount: widget.accountToEdit!,
-    );
-    //
+    if (widget.type == AccountType.credit) {
+      CreditAccount account = widget.crAccountToEdit!;
+      account = CreditAccount(
+        id: account.id,
+        name: name,
+        transactions: account.transactions,
+      );
+      myProvider.updateAccount(
+        updatedUserCreditAccount: account,
+        updatedUserDebitAccount: null,
+      );
+    } else {
+      DebitAccount account = widget.drAccountToEdit!;
+      account = DebitAccount(
+        id: account.id,
+        name: name,
+        transactions: account.transactions,
+      );
+      myProvider.updateAccount(
+        updatedUserCreditAccount: null,
+        updatedUserDebitAccount: account,
+      );
+    }
 
     widget.onRefresh();
     Future.delayed(const Duration(milliseconds: 500))
@@ -123,37 +132,60 @@ class _AddDebitAccountBottomSheetState
       );
       return;
     }
-    final userDebitAccount = DebitAccount(
-      id: DateTime.now().toIso8601String(),
-      name: name,
-      transactions: [
-        Transactions.initial(
-          id: DateTime.now().toIso8601String(),
-          balance: double.parse(
-            balance.isEmpty ? '0.0' : balance,
-          ),
-        )
-      ],
-    );
+    if (widget.type == AccountType.credit) {
+      final userCreditAccount = CreditAccount(
+        id: DateTime.now().toIso8601String(),
+        name: name,
+        transactions: [
+          Transactions.initial(
+            id: DateTime.now().toIso8601String(),
+            balance: double.parse(
+              balance.isEmpty ? '0.0' : balance,
+            ),
+          )
+        ],
+      );
 
-    myProvider.addAccount(
-      userCreditAccount: null,
-      userDebitAccount: userDebitAccount,
-    );
+      myProvider.addAccount(
+        userCreditAccount: userCreditAccount,
+        userDebitAccount: null,
+      );
+    } else {
+      final userDebitAccount = DebitAccount(
+        id: DateTime.now().toIso8601String(),
+        name: name,
+        transactions: [
+          Transactions.initial(
+            id: DateTime.now().toIso8601String(),
+            balance: double.parse(
+              balance.isEmpty ? '0.0' : balance,
+            ),
+          )
+        ],
+      );
+
+      myProvider.addAccount(
+        userCreditAccount: null,
+        userDebitAccount: userDebitAccount,
+      );
+    }
+
     widget.onRefresh();
     Future.delayed(const Duration(milliseconds: 500))
         .then((value) => loading.hide());
     Navigator.of(context).pop();
   }
 
-  void _checkAccount() => widget.accountToEdit == null
-      ? null
-      : setState(() {
-          mood = SheetMood.update;
-        });
+  void _checkAccount() =>
+      widget.crAccountToEdit == null && widget.drAccountToEdit == null
+          ? null
+          : setState(() {
+              mood = SheetMood.update;
+            });
 
   @override
   Widget build(BuildContext context) {
+    final type = widget.type;
     dSize = MediaQuery.of(context).size;
     return Container(
       constraints: BoxConstraints(
@@ -167,8 +199,10 @@ class _AddDebitAccountBottomSheetState
           SizedBox(height: dSize.height * 0.01),
           Text(
             mood == SheetMood.update
-                ? AppConfig.updateAccount + widget.accountToEdit!.name
-                : AppConfig.addDebitAccount,
+                ? AppConfig.updateAccount
+                : type == AccountType.credit
+                    ? AppConfig.addCreditAccount
+                    : AppConfig.addDebitAccount,
             style: Theme.of(context).textTheme.headlineLarge,
           ),
           SizedBox(height: dSize.height * 0.05),
@@ -178,12 +212,13 @@ class _AddDebitAccountBottomSheetState
             textFieldLabel: AppConfig.accountName,
             kType: TextInputType.name,
           ),
-          kTextField(
-            controller: balanceController,
-            textFieldHint: AppConfig.accountBalanceHint,
-            textFieldLabel: AppConfig.accountBalance,
-            kType: TextInputType.number,
-          ),
+          if (mood == SheetMood.add)
+            kTextField(
+              controller: balanceController,
+              textFieldHint: AppConfig.accountBalanceHint,
+              textFieldLabel: AppConfig.accountBalance,
+              kType: TextInputType.number,
+            ),
           SizedBox(height: dSize.height * 0.05),
           ElevatedButton(
             onPressed:
@@ -191,7 +226,9 @@ class _AddDebitAccountBottomSheetState
             child: Text(
               mood == SheetMood.update
                   ? AppConfig.updateAccount
-                  : AppConfig.addDebitAccount + accNameController.text,
+                  : type == AccountType.credit
+                      ? AppConfig.addCreditAccount
+                      : AppConfig.addDebitAccount,
             ),
           )
         ],

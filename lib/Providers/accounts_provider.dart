@@ -2,16 +2,10 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:masrufat/Models/credit_account.dart';
-import 'package:masrufat/Models/debit_account.dart';
+import 'package:masrufat/Models/accounts.dart';
 import 'package:masrufat/Models/transaction.dart';
 
 import '../helper/app_config.dart';
-
-enum AccountType {
-  credit,
-  debit,
-}
 
 class AccountsProvider with ChangeNotifier {
   final Box<CreditAccount> _dataBaseBoxForCredit =
@@ -102,8 +96,8 @@ class AccountsProvider with ChangeNotifier {
   }
 
   Future<void> deleteAccount({
-    required CreditAccount? deleteUserCreditAccount,
-    required DebitAccount? deleteUserDebitAccount,
+    CreditAccount? deleteUserCreditAccount,
+    DebitAccount? deleteUserDebitAccount,
   }) async {
     if (deleteUserCreditAccount != null) {
       _userCreditAccounts.remove(deleteUserCreditAccount);
@@ -128,17 +122,13 @@ class AccountsProvider with ChangeNotifier {
     if (existCreditAccount != null) {
       //? add transaction to accountTransactions
       existCreditAccount.transactions.add(newTransaction);
-
       //? add transactionBalance to total balance of the account
-
       _totalCreditBalance += newTransaction.balance;
-      _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
       //? save New Updated Account to DataBase
       _dataBaseBoxForCredit.put(existCreditAccount.id, existCreditAccount);
     } else if (existDebitAccount != null) {
       existDebitAccount.transactions.add(newTransaction);
       _totalDebitBalance += newTransaction.balance;
-      _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
       _dataBaseBoxForDebit.put(existDebitAccount.id, existDebitAccount);
     }
     if (!newTransaction.isIncome) {
@@ -183,20 +173,24 @@ class AccountsProvider with ChangeNotifier {
   }
 
   Future<void> fetchCreditBalance() async {
+    double balance = 0;
     for (var element in _userCreditAccounts) {
       for (var trans in element.transactions) {
-        _totalCreditBalance += trans.balance;
+        balance += trans.balance;
       }
     }
+    _totalCreditBalance = balance;
     _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
   }
 
   Future<void> fetchDebitBalance() async {
+    double balance = 0;
     for (var element in _userDebitAccounts) {
       for (var trans in element.transactions) {
-        _totalDebitBalance += trans.balance;
+        balance += trans.balance;
       }
     }
+    _totalDebitBalance = balance;
     _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
   }
 

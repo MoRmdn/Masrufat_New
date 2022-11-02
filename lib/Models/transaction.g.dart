@@ -8,7 +8,7 @@ part of 'transaction.dart';
 
 class TransactionsAdapter extends TypeAdapter<Transactions> {
   @override
-  final int typeId = 2;
+  final int typeId = 3;
 
   @override
   Transactions read(BinaryReader reader) {
@@ -23,13 +23,13 @@ class TransactionsAdapter extends TypeAdapter<Transactions> {
       isIncome: fields[3] as bool,
       balance: fields[1] as double,
       transferTo: fields[5] as String?,
-    );
+    )..transferFrom = fields[6] as String?;
   }
 
   @override
   void write(BinaryWriter writer, Transactions obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,7 +41,9 @@ class TransactionsAdapter extends TypeAdapter<Transactions> {
       ..writeByte(4)
       ..write(obj.description)
       ..writeByte(5)
-      ..write(obj.transferTo);
+      ..write(obj.transferTo)
+      ..writeByte(6)
+      ..write(obj.transferFrom);
   }
 
   @override

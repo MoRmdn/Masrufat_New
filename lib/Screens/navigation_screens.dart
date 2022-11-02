@@ -2,8 +2,7 @@ import 'dart:developer';
 
 import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:flutter/material.dart';
-import 'package:masrufat/Models/credit_account.dart';
-import 'package:masrufat/Models/debit_account.dart';
+import 'package:masrufat/Models/accounts.dart';
 import 'package:masrufat/Models/transaction.dart';
 import 'package:masrufat/Screens/expenses/expenses.dart';
 import 'package:masrufat/Screens/settings_screen/settings.dart';
@@ -11,8 +10,7 @@ import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
 import '../Providers/accounts_provider.dart';
-import 'credit_account_screen/account_widgets/credit_accounts_card.dart';
-import 'debit_account_screen/account_widgets/debit_accounts_card.dart';
+import 'account_widgets/account_cards.dart';
 
 // ignore: must_be_immutable
 class NavigationScreen extends StatefulWidget {
@@ -83,6 +81,8 @@ class _NavigationScreenState extends State<NavigationScreen>
     super.dispose();
   }
 
+  void _onRefresh() => setState(() {});
+
   Future<void> fetchData() async {
     Future.delayed(const Duration(microseconds: 0)).then((value) {
       creditAccount = myProvider.getUserCreditAccounts;
@@ -99,12 +99,18 @@ class _NavigationScreenState extends State<NavigationScreen>
     log('Navigation');
     fetchData();
     return creditAccount.isNotEmpty && widget.index == 0
-        ? CreditAccountCard(
-            accounts: creditAccount,
+        ? AccountCards(
+            onRefresh: _onRefresh,
+            creditAccounts: creditAccount,
+            debitAccounts: debitAccount,
+            type: AccountType.credit,
           )
         : debitAccount.isNotEmpty && widget.index == 1
-            ? DebitAccountCard(
-                accounts: debitAccount,
+            ? AccountCards(
+                onRefresh: _onRefresh,
+                creditAccounts: creditAccount,
+                debitAccounts: debitAccount,
+                type: AccountType.debit,
               )
             : widget.index == 2 && expenses.isNotEmpty
                 ? Expenses(
