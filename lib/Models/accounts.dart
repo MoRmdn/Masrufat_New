@@ -4,22 +4,30 @@ import 'package:masrufat/Models/transaction.dart';
 part 'accounts.g.dart';
 
 abstract class Accounts extends HiveObject {
-  Accounts();
-}
-
-@HiveType(typeId: 1)
-class CreditAccount extends Accounts {
   @HiveField(0)
   final String id;
   @HiveField(1)
   final String name;
   @HiveField(2)
   final List<Transactions> transactions;
-  CreditAccount({
+  Accounts({
     required this.transactions,
     required this.id,
     required this.name,
   });
+}
+
+@HiveType(typeId: 1)
+class CreditAccount extends Accounts {
+  CreditAccount({
+    required String id,
+    required String name,
+    required List<Transactions> transactions,
+  }) : super(
+          id: id,
+          name: name,
+          transactions: transactions,
+        );
 
   Map<String, dynamic> toMap() => {
         'id': id,
@@ -45,17 +53,30 @@ class CreditAccount extends Accounts {
 
 @HiveType(typeId: 2)
 class DebitAccount extends Accounts {
-  @HiveField(0)
-  final String id;
-  @HiveField(1)
-  final String name;
-  @HiveField(2)
-  final List<Transactions> transactions;
   DebitAccount({
-    required this.id,
-    required this.transactions,
-    required this.name,
-  });
+    required String id,
+    required String name,
+    required List<Transactions> transactions,
+  }) : super(
+          id: id,
+          name: name,
+          transactions: transactions,
+        );
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'name': name,
+        'transactions': transactions,
+      };
+
+  factory DebitAccount.fromMap(Map map) {
+    return DebitAccount(
+      name: map['name'],
+      id: map['id'],
+      transactions: map['transactions'],
+    );
+  }
+
   @override
   String toString() => {
         'id': id,
