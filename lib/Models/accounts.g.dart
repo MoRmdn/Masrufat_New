@@ -17,9 +17,9 @@ class CreditAccountAdapter extends TypeAdapter<CreditAccount> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return CreditAccount(
-      transactions: (fields[2] as List).cast<Transactions>(),
       id: fields[0] as String,
       name: fields[1] as String,
+      transactions: (fields[2] as List).cast<Transactions>(),
     );
   }
 
@@ -58,8 +58,8 @@ class DebitAccountAdapter extends TypeAdapter<DebitAccount> {
     };
     return DebitAccount(
       id: fields[0] as String,
-      transactions: (fields[2] as List).cast<Transactions>(),
       name: fields[1] as String,
+      transactions: (fields[2] as List).cast<Transactions>(),
     );
   }
 
