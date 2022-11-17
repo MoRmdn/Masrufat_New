@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:masrufat/helper/app_config.dart';
 
-import '../Screens/account_widgets/add_credit_account_bottom_sheet.dart';
+import '../Screens/account_widgets/add_account_bottom_sheet.dart';
 
 Future<void> loadAccountCreation({
   required BuildContext context,

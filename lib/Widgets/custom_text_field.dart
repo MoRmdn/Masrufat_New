@@ -5,10 +5,12 @@ Widget kTextField({
   required String textFieldLabel,
   required String textFieldHint,
   required TextInputType kType,
+  FocusNode? focusNode,
 }) =>
     Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextField(
+        focusNode: focusNode,
         controller: controller,
         keyboardType: kType,
         decoration: InputDecoration(

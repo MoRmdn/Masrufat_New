@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:masrufat/Models/accounts.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
 
-import '../Screens/account_widgets/add_credit_account_bottom_sheet.dart';
+import '../Screens/account_widgets/add_account_bottom_sheet.dart';
 import '../dialog/custom_generic_dialog.dart';
 import '../helper/app_config.dart';
 

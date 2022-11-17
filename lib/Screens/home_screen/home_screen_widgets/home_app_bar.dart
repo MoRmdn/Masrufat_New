@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../helper/app_config.dart';
-import '../../account_widgets/add_credit_account_bottom_sheet.dart';
+import '../../account_widgets/add_account_bottom_sheet.dart';
 
 AppBar getAppBar({
   required BuildContext context,

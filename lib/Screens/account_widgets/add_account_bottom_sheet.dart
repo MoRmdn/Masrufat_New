@@ -35,6 +35,7 @@ class AddAccountBottomSheet extends StatefulWidget {
 class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
   final TextEditingController accNameController = TextEditingController();
   final TextEditingController balanceController = TextEditingController();
+  final _textFocusNode = FocusNode();
 
   SheetMood mood = SheetMood.add;
   final loading = LoadingScreen.instance();
@@ -43,6 +44,7 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
 
   @override
   void initState() {
+    _textFocusNode.requestFocus();
     myProvider = Provider.of<AccountsProvider>(context, listen: false);
     _checkAccount();
     if (mood == SheetMood.update) _updateMode();
@@ -51,6 +53,7 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
 
   @override
   void dispose() {
+    _textFocusNode.dispose();
     accNameController.dispose();
     balanceController.dispose();
     super.dispose();
@@ -207,6 +210,7 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
           ),
           SizedBox(height: dSize.height * 0.05),
           kTextField(
+            focusNode: _textFocusNode,
             controller: accNameController,
             textFieldHint: AppConfig.accountNameHint,
             textFieldLabel: AppConfig.accountName,
@@ -230,7 +234,7 @@ class _AddAccountBottomSheetState extends State<AddAccountBottomSheet> {
                       ? AppConfig.addCreditAccount
                       : AppConfig.addDebitAccount,
             ),
-          )
+          ),
         ],
       ),
     );
