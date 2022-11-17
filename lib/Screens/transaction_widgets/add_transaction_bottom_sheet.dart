@@ -40,6 +40,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
   final transactionNameController = TextEditingController();
   final descriptionController = TextEditingController();
   final balanceController = TextEditingController();
+  final _textFocusNode = FocusNode();
   String timeAsID = DateTime.now().toIso8601String();
   late AccountsProvider myProvider;
   bool switchValue = false;
@@ -48,6 +49,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
 
   @override
   void initState() {
+    _textFocusNode.requestFocus();
     myProvider = Provider.of<AccountsProvider>(context, listen: false);
     _checkMood();
     if (mood == TansMood.update) _updateMode();
@@ -56,6 +58,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
 
   @override
   void dispose() {
+    _textFocusNode.dispose();
     descriptionController.dispose();
     balanceController.dispose();
     transactionNameController.dispose();
@@ -288,6 +291,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
           ),
           SizedBox(height: dSize.height * 0.05),
           kTextField(
+            focusNode: _textFocusNode,
             controller: transactionNameController,
             textFieldHint: AppConfig.transactionName,
             textFieldLabel: AppConfig.transactionNameHint,

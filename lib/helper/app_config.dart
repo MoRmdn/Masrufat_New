@@ -1,3 +1,5 @@
+import 'dart:math' as math show Random;
+
 import 'package:flutter/material.dart' show Color, Colors, Widget;
 
 import '../Widgets/iterable_list_view.dart';
@@ -23,17 +25,32 @@ extension ToListView<T> on Iterable<T> {
       );
 }
 
+//* add this method to Iterable Class
+extension GetRandomValue<T> on Iterable<T> {
+  T getRandomValue() => elementAt(math.Random().nextInt(length));
+}
+
 class AppConfig {
   static const Color primaryColor = Colors.indigo;
   static const Color secondaryColor = Colors.amber;
   static const Color authColors = Colors.white;
   static const double textFieldSized = 0.8;
-  static const List<Color> cardColorList = [
+  static const Iterable<Color> cardColorList = [
     Colors.teal,
     Colors.blue,
     Colors.cyan,
     Colors.deepPurple,
-    Colors.tealAccent
+    Colors.tealAccent,
+    Colors.teal,
+    Colors.blue,
+    Colors.cyan,
+    Colors.deepPurple,
+    Colors.tealAccent,
+    Colors.teal,
+    Colors.blue,
+    Colors.cyan,
+    Colors.deepPurple,
+    Colors.tealAccent,
   ];
   //? appTitle
   static const appTitle = 'Masrufat';
