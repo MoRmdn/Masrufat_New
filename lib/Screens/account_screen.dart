@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/accounts.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
+import 'package:masrufat/Screens/transaction_widgets/transfare_money.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
@@ -27,14 +28,20 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  late AccountsProvider myProvider;
+  late AccountsProvider myProvider =
+      Provider.of<AccountsProvider>(context, listen: false);
+  late CreditAccount? crAccount = widget.crAccount;
+  late DebitAccount? drAccount = widget.drAccount;
+  late final AccountType _type = widget.type;
 
   bool isExpanded = false;
 
-  @override
-  void didChangeDependencies() {
-    myProvider = Provider.of<AccountsProvider>(context, listen: false);
-    super.didChangeDependencies();
+  double getTotal(Accounts account) {
+    double total = 0;
+    for (var trans in account.transactions) {
+      total += trans.balance;
+    }
+    return total;
   }
 
   void _onRefresh() => setState(() {});
@@ -69,9 +76,7 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   Widget build(BuildContext context) {
     log('AccountScreen');
-    final crAccount = widget.crAccount;
-    final drAccount = widget.drAccount;
-    final _type = widget.type;
+
     final dSize = MediaQuery.of(context).size;
     const style = TextStyle(color: Colors.white, fontSize: 20);
     return Scaffold(
@@ -86,7 +91,7 @@ class _AccountScreenState extends State<AccountScreen> {
             onPressed: () => showModalBottomSheet<void>(
               isScrollControlled: true,
               context: context,
-              builder: (BuildContext context) {
+              builder: (context) {
                 return Padding(
                   padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -101,7 +106,28 @@ class _AccountScreenState extends State<AccountScreen> {
               },
             ),
             icon: const Icon(Icons.add),
-          )
+          ),
+          if (_type == AccountType.credit)
+            IconButton(
+              onPressed: () => showModalBottomSheet<void>(
+                isScrollControlled: true,
+                context: context,
+                builder: (context) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: TransferMoney(
+                      reFresh: _onRefresh,
+                      crAccount: crAccount!,
+                    ),
+                  );
+                },
+              ),
+              icon: const Icon(
+                Icons.compare_arrows,
+              ),
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -134,8 +160,8 @@ class _AccountScreenState extends State<AccountScreen> {
                       hight: 50,
                       title: AppConfig.accountBalance + ':',
                       value: _type == AccountType.credit
-                          ? myProvider.getTotalCreditBalance.toString()
-                          : myProvider.getTotalDebitBalance.toString(),
+                          ? getTotal(crAccount as CreditAccount).toString()
+                          : getTotal(drAccount as DebitAccount).toString(),
                       style: style,
                     ),
                   ],

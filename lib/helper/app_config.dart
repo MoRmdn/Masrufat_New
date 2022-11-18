@@ -65,6 +65,7 @@ class AppConfig {
   static const addDebitAccount = 'Add Debit Account';
   static const updateAccount = 'Update Account :';
   static const addTransAction = 'Add Transaction';
+
   static const updateTransAction = 'Update Transaction';
   static const accountName = 'Account Name';
   static const accountNameHint = 'Salary or CIB';
@@ -87,13 +88,19 @@ class AppConfig {
   static const support = 'Support';
   static const termsAndConditions = 'Terms and Conditions';
 
+  static const transferMoney = 'Transfer Money';
+  static const transferMoneyFrom = 'Transfer From';
+  static const transferMoneyTo = 'Transfer To';
+
   static const transactionName = 'Transaction Name ';
+
   static const transactionNameHint = 'Transaction Name';
   static const transactionDescription = 'Transaction Description ';
   static const transactionDescriptionHint = 'Transaction Description';
   static const transactionBalance = 'Transaction Balance';
   static const transactionBalanceHint = '500.00';
   static const transactionEditedBalance = 'EditedBalance';
+  static const transactionIsIncome = 'Income';
 
   //? Dialog error info
   static const dialogErrorTitle = 'Error';
