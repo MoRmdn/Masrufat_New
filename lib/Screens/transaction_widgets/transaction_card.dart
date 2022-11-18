@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:masrufat/Models/accounts.dart';
 import 'package:masrufat/Models/transaction.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
@@ -97,7 +98,9 @@ class _TransactionCardState extends State<TransactionCard> {
               style: incomeStyle,
             ),
             subtitle: Text(
-              transaction.id,
+              DateFormat('MMM d,h:mm a')
+                  .format(DateTime.parse(transaction.id))
+                  .toString(),
               style: incomeStyle,
             ),
             leading: Text(
