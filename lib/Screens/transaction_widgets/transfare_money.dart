@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/accounts.dart';
 import 'package:masrufat/Models/transaction.dart';
@@ -27,6 +28,7 @@ class _TransferMoneyState extends State<TransferMoney> {
   late AccountsProvider myProvider =
       Provider.of<AccountsProvider>(context, listen: false);
   late List<DebitAccount> debitAccounts = myProvider.getUserDebitAccounts;
+  late List<CreditAccount> creditAccounts = myProvider.getUserCreditAccounts;
   late CreditAccount crAccount = widget.crAccount;
   final transactionNameController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -43,6 +45,11 @@ class _TransferMoneyState extends State<TransferMoney> {
   void initState() {
     for (var element in debitAccounts) {
       accountsName.add(element.name);
+    }
+    for (var element in creditAccounts) {
+      if (element.name != crAccount.name) {
+        accountsName.add(element.name);
+      }
     }
     _textFocusNode.requestFocus();
     super.initState();
@@ -80,33 +87,63 @@ class _TransferMoneyState extends State<TransferMoney> {
       return;
     }
 
-    final debitAccount =
-        debitAccounts.firstWhere((element) => element.name == initial);
-
-    final debitTrans = Transactions(
-      id: timeAsID,
-      name: transactionName,
-      description: description,
-      isIncome: true,
-      balance: double.parse(transactionBalance),
+    DebitAccount? debitAccount = debitAccounts.firstWhereOrNull(
+      (element) => element.name == initial,
     );
-    final creditTrans = Transactions(
-      id: timeAsID,
-      description: description,
-      name: transactionName,
-      isIncome: false,
-      balance: -double.parse(transactionBalance),
+    CreditAccount? creditAccount = creditAccounts.firstWhereOrNull(
+      (element) => element.name == initial,
     );
-    myProvider.addTransaction(
-      existCreditAccount: crAccount,
-      newTransaction: creditTrans,
-      existDebitAccount: null,
-    );
-    myProvider.addTransaction(
-      existCreditAccount: null,
-      newTransaction: debitTrans,
-      existDebitAccount: debitAccount,
-    );
+    if (debitAccount != null) {
+      final debitTrans = Transactions(
+        id: timeAsID,
+        name: transactionName,
+        description: description,
+        isIncome: true,
+        balance: double.parse(transactionBalance),
+      );
+      final creditTrans = Transactions(
+        id: timeAsID,
+        description: description,
+        name: transactionName,
+        isIncome: false,
+        balance: -double.parse(transactionBalance),
+      );
+      myProvider.addTransaction(
+        existCreditAccount: crAccount,
+        newTransaction: creditTrans,
+        existDebitAccount: null,
+      );
+      myProvider.addTransaction(
+        existCreditAccount: null,
+        newTransaction: debitTrans,
+        existDebitAccount: debitAccount,
+      );
+    } else {
+      final creditTransTo = Transactions(
+        id: timeAsID,
+        name: transactionName,
+        description: description,
+        isIncome: true,
+        balance: double.parse(transactionBalance),
+      );
+      final creditTransFrom = Transactions(
+        id: timeAsID,
+        description: description,
+        name: transactionName,
+        isIncome: false,
+        balance: -double.parse(transactionBalance),
+      );
+      myProvider.addTransaction(
+        existCreditAccount: crAccount,
+        newTransaction: creditTransFrom,
+        existDebitAccount: null,
+      );
+      myProvider.addTransaction(
+        existCreditAccount: creditAccount,
+        newTransaction: creditTransTo,
+        existDebitAccount: null,
+      );
+    }
 
     widget.reFresh();
     Future.delayed(const Duration(milliseconds: 500))
