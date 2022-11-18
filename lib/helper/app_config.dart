@@ -113,6 +113,10 @@ class AppConfig {
   static const dataBaseBoxForCredit = 'myAccounts';
   static const dataBaseBoxForDebit = 'myDebitAccounts';
 
+  static const delete = 'Delete';
+  static const edit = 'Edit';
+  static const transfer = 'Transfer';
+
   //? assets
   static const loginBackgroundImage = 'assets/images/2.png';
   static const signUpBackgroundImage = 'assets/images/1.png';

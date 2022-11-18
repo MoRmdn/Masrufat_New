@@ -22,8 +22,8 @@ class TransactionsAdapter extends TypeAdapter<Transactions> {
       description: fields[4] as String,
       isIncome: fields[3] as bool,
       balance: fields[1] as double,
-      transferTo: fields[5] as String?,
-    )..transferFrom = fields[6] as String?;
+      transferTo: fields[5] as Account?,
+    )..transferFrom = fields[6] as Account?;
   }
 
   @override

@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 
 import '../../../Widgets/edit_delete_dialogs.dart';
 
-// ignore: must_be_immutable
 class AccountCards extends StatefulWidget {
   final List<CreditAccount>? creditAccounts;
   final List<DebitAccount>? debitAccounts;

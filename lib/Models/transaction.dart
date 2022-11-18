@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
 
+import 'accounts.dart';
+
 part 'transaction.g.dart';
 
 @HiveType(typeId: 3)
@@ -15,9 +17,9 @@ class Transactions extends HiveObject {
   @HiveField(4)
   final String description;
   @HiveField(5)
-  String? transferTo;
+  Account? transferTo;
   @HiveField(6)
-  String? transferFrom;
+  Account? transferFrom;
 
   Transactions({
     required this.id,
@@ -26,6 +28,7 @@ class Transactions extends HiveObject {
     required this.isIncome,
     required this.balance,
     this.transferTo,
+    this.transferFrom,
   });
 
   factory Transactions.fromMap(Map map) {

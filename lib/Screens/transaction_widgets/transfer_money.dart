@@ -90,7 +90,7 @@ class _TransferMoneyState extends State<TransferMoney> {
     DebitAccount? debitAccount = debitAccounts.firstWhereOrNull(
       (element) => element.name == initial,
     );
-    CreditAccount? creditAccount = creditAccounts.firstWhereOrNull(
+    CreditAccount? creditAccountToTransfer = creditAccounts.firstWhereOrNull(
       (element) => element.name == initial,
     );
     if (debitAccount != null) {
@@ -100,6 +100,7 @@ class _TransferMoneyState extends State<TransferMoney> {
         description: description,
         isIncome: true,
         balance: double.parse(transactionBalance),
+        transferFrom: crAccount,
       );
       final creditTrans = Transactions(
         id: timeAsID,
@@ -107,6 +108,7 @@ class _TransferMoneyState extends State<TransferMoney> {
         name: transactionName,
         isIncome: false,
         balance: -double.parse(transactionBalance),
+        transferTo: debitAccount,
       );
       myProvider.addTransaction(
         existCreditAccount: crAccount,
@@ -125,6 +127,7 @@ class _TransferMoneyState extends State<TransferMoney> {
         description: description,
         isIncome: true,
         balance: double.parse(transactionBalance),
+        transferTo: creditAccountToTransfer,
       );
       final creditTransFrom = Transactions(
         id: timeAsID,
@@ -132,6 +135,7 @@ class _TransferMoneyState extends State<TransferMoney> {
         name: transactionName,
         isIncome: false,
         balance: -double.parse(transactionBalance),
+        transferFrom: crAccount,
       );
       myProvider.addTransaction(
         existCreditAccount: crAccount,
@@ -139,7 +143,7 @@ class _TransferMoneyState extends State<TransferMoney> {
         existDebitAccount: null,
       );
       myProvider.addTransaction(
-        existCreditAccount: creditAccount,
+        existCreditAccount: creditAccountToTransfer,
         newTransaction: creditTransTo,
         existDebitAccount: null,
       );

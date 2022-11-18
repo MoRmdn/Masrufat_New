@@ -3,14 +3,14 @@ import 'package:masrufat/Models/transaction.dart';
 
 part 'accounts.g.dart';
 
-abstract class Accounts extends HiveObject {
+abstract class Account extends HiveObject {
   @HiveField(0)
   final String id;
   @HiveField(1)
   final String name;
   @HiveField(2)
   final List<Transactions> transactions;
-  Accounts({
+  Account({
     required this.transactions,
     required this.id,
     required this.name,
@@ -18,7 +18,7 @@ abstract class Accounts extends HiveObject {
 }
 
 @HiveType(typeId: 1)
-class CreditAccount extends Accounts {
+class CreditAccount extends Account {
   CreditAccount({
     required String id,
     required String name,
@@ -52,7 +52,7 @@ class CreditAccount extends Accounts {
 }
 
 @HiveType(typeId: 2)
-class DebitAccount extends Accounts {
+class DebitAccount extends Account {
   DebitAccount({
     required String id,
     required String name,

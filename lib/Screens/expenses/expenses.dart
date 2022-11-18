@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:masrufat/Models/transaction.dart';
 import 'package:provider/provider.dart';
 
@@ -133,19 +134,26 @@ class _ExpensesState extends State<Expenses> with TickerProviderStateMixin {
                 mainAxisSize: MainAxisSize.min,
                 children: widget.expensesThisMonth
                     .map(
-                      (trans) => Container(
-                        margin: const EdgeInsets.all(10),
+                      (trans) => Card(
+                        margin:
+                            const EdgeInsets.only(left: 5, right: 5, top: 5),
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                         color: Colors.red,
                         child: ListTile(
-                          textColor: Colors.white,
                           title: Text(
                             trans.name,
                           ),
-                          subtitle: Text(
-                            trans.id,
-                          ),
+                          subtitle: Text(trans.description),
                           leading: Text(
                             trans.balance.toString(),
+                          ),
+                          trailing: Text(
+                            DateFormat('MMM d,h:mm a')
+                                .format(DateTime.parse(trans.id))
+                                .toString(),
                           ),
                         ),
                       ),

@@ -30,6 +30,11 @@ class TransactionCard extends StatefulWidget {
 }
 
 class _TransactionCardState extends State<TransactionCard> {
+  late Transactions transaction = widget.trans;
+  late CreditAccount? crAccount = widget.crAccount;
+  late DebitAccount? drAccount = widget.drAccount;
+  late final _type = widget.type;
+  final UniqueKey _key = UniqueKey();
   bool isExpanded = false;
   late AccountsProvider myProvider;
   @override
@@ -69,10 +74,7 @@ class _TransactionCardState extends State<TransactionCard> {
   @override
   Widget build(BuildContext context) {
     int index;
-    final transaction = widget.trans;
-    final crAccount = widget.crAccount;
-    final drAccount = widget.drAccount;
-    final _type = widget.type;
+
     if (_type == AccountType.credit) {
       index = crAccount!.transactions
           .indexWhere((element) => element.id == transaction.id);
@@ -84,13 +86,20 @@ class _TransactionCardState extends State<TransactionCard> {
       color: transaction.isIncome ? Colors.black : Colors.white,
     );
     return Column(
+      key: _key,
       mainAxisSize: MainAxisSize.min,
       children: [
         Card(
+          margin: const EdgeInsets.only(left: 5, right: 5, top: 5),
+          elevation: 5,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.only(
+              topLeft: const Radius.circular(20),
+              topRight: const Radius.circular(20),
+              bottomLeft: Radius.circular(isExpanded ? 0 : 20),
+              bottomRight: Radius.circular(isExpanded ? 0 : 20),
+            ),
           ),
-          margin: const EdgeInsets.all(10),
           color: transaction.isIncome ? Colors.green : Colors.red,
           child: ListTile(
             title: Text(
@@ -121,57 +130,87 @@ class _TransactionCardState extends State<TransactionCard> {
           ),
         ),
         if (isExpanded)
-          Column(
-            children: [
-              Text(transaction.description),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => showModalBottomSheet<void>(
-                        isScrollControlled: true,
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).viewInsets.bottom,
-                            ),
-                            child: AddTransactionBottomSheet(
-                              transIndex: index,
-                              isUpdate: true,
-                              reFresh: _onRefresh,
-                              crAccount: crAccount,
-                              drAccount: drAccount,
-                              type: _type,
-                            ),
-                          );
-                        },
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: const [
-                          Text('edit'),
-                          Icon(Icons.edit),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => _onDeleteTransaction(index),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: const [
-                          Text('delete'),
-                          Icon(Icons.delete),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+          Container(
+            padding: const EdgeInsets.all(8),
+            margin: const EdgeInsets.only(left: 5, right: 5, bottom: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(isExpanded ? 0 : 20),
+                topRight: Radius.circular(isExpanded ? 0 : 20),
+                bottomLeft: const Radius.circular(20),
+                bottomRight: const Radius.circular(20),
               ),
-            ],
+              color: Colors.black12,
+            ),
+            child: Column(
+              children: [
+                Text(transaction.description),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => showModalBottomSheet<void>(
+                          isScrollControlled: true,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                bottom:
+                                    MediaQuery.of(context).viewInsets.bottom,
+                              ),
+                              child: AddTransactionBottomSheet(
+                                transIndex: index,
+                                isUpdate: true,
+                                reFresh: _onRefresh,
+                                crAccount: crAccount,
+                                drAccount: drAccount,
+                                type: _type,
+                              ),
+                            );
+                          },
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: const [
+                            Text(AppConfig.edit),
+                            Icon(Icons.edit),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {},
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: const [
+                            Text(
+                              AppConfig.transfer,
+                            ),
+                            Icon(
+                              Icons.compare_arrows,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => _onDeleteTransaction(index),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: const [
+                            Text(AppConfig.delete),
+                            Icon(Icons.delete),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           )
       ],
     );

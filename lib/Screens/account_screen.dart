@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:masrufat/Models/accounts.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
-import 'package:masrufat/Screens/transaction_widgets/transfare_money.dart';
+import 'package:masrufat/Screens/transaction_widgets/transfer_money.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
@@ -36,7 +36,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
   bool isExpanded = false;
 
-  double getTotal(Accounts account) {
+  double getTotal(Account account) {
     double total = 0;
     for (var trans in account.transactions) {
       total += trans.balance;
@@ -87,26 +87,6 @@ class _AccountScreenState extends State<AccountScreen> {
           _type == AccountType.credit ? crAccount!.name : drAccount!.name,
         ),
         actions: [
-          IconButton(
-            onPressed: () => showModalBottomSheet<void>(
-              isScrollControlled: true,
-              context: context,
-              builder: (context) {
-                return Padding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom,
-                  ),
-                  child: AddTransactionBottomSheet(
-                    reFresh: _onRefresh,
-                    crAccount: crAccount,
-                    drAccount: drAccount,
-                    type: _type,
-                  ),
-                );
-              },
-            ),
-            icon: const Icon(Icons.add),
-          ),
           if (_type == AccountType.credit)
             IconButton(
               onPressed: () => showModalBottomSheet<void>(
@@ -128,6 +108,26 @@ class _AccountScreenState extends State<AccountScreen> {
                 Icons.compare_arrows,
               ),
             ),
+          IconButton(
+            onPressed: () => showModalBottomSheet<void>(
+              isScrollControlled: true,
+              context: context,
+              builder: (context) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: AddTransactionBottomSheet(
+                    reFresh: _onRefresh,
+                    crAccount: crAccount,
+                    drAccount: drAccount,
+                    type: _type,
+                  ),
+                );
+              },
+            ),
+            icon: const Icon(Icons.add),
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -175,29 +175,35 @@ class _AccountScreenState extends State<AccountScreen> {
               children: _type == AccountType.credit
                   ? crAccount!.transactions
                       .map(
-                        (element) => TransactionCard(
-                          trans: element,
-                          crAccount: crAccount,
-                          drAccount: drAccount,
-                          type: _type,
-                          onRefresh: () {
-                            widget.onRefresh();
-                            _onRefresh();
-                          },
+                        (element) => Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TransactionCard(
+                            trans: element,
+                            crAccount: crAccount,
+                            drAccount: drAccount,
+                            type: _type,
+                            onRefresh: () {
+                              widget.onRefresh();
+                              _onRefresh();
+                            },
+                          ),
                         ),
                       )
                       .toList()
                   : drAccount!.transactions
                       .map(
-                        (element) => TransactionCard(
-                          trans: element,
-                          crAccount: crAccount,
-                          drAccount: drAccount,
-                          type: _type,
-                          onRefresh: () {
-                            widget.onRefresh();
-                            _onRefresh();
-                          },
+                        (element) => Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TransactionCard(
+                            trans: element,
+                            crAccount: crAccount,
+                            drAccount: drAccount,
+                            type: _type,
+                            onRefresh: () {
+                              widget.onRefresh();
+                              _onRefresh();
+                            },
+                          ),
                         ),
                       )
                       .toList(),
