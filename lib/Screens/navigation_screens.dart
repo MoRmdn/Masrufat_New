@@ -16,12 +16,12 @@ import 'account_widgets/account_cards.dart';
 class NavigationScreen extends StatefulWidget {
   static const routName = AppConfig.navigationRouteName;
   final IconData iconData;
-  int index;
+  int pageIndex;
 
   NavigationScreen({
     Key? key,
     required this.iconData,
-    required this.index,
+    required this.pageIndex,
   }) : super(key: key);
 
   @override
@@ -30,7 +30,8 @@ class NavigationScreen extends StatefulWidget {
 
 class _NavigationScreenState extends State<NavigationScreen>
     with TickerProviderStateMixin {
-  late AccountsProvider myProvider;
+  late AccountsProvider myProvider =
+      Provider.of<AccountsProvider>(context, listen: false);
   List<CreditAccount> creditAccount = [];
   List<DebitAccount> debitAccount = [];
   List<Transactions> expensesThisMonth = [];
@@ -50,7 +51,6 @@ class _NavigationScreenState extends State<NavigationScreen>
 
   @override
   void initState() {
-    myProvider = Provider.of<AccountsProvider>(context, listen: false);
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
@@ -84,6 +84,7 @@ class _NavigationScreenState extends State<NavigationScreen>
   void _onRefresh() => setState(() {});
 
   Future<void> fetchData() async {
+    log("Fetch Data From Server");
     Future.delayed(const Duration(microseconds: 0)).then((value) {
       creditAccount = myProvider.getUserCreditAccounts;
       debitAccount = myProvider.getUserDebitAccounts;
@@ -96,30 +97,31 @@ class _NavigationScreenState extends State<NavigationScreen>
 
   @override
   Widget build(BuildContext context) {
+    int pageIndex = widget.pageIndex;
     log('Navigation');
     fetchData();
-    return creditAccount.isNotEmpty && widget.index == 0
+    return creditAccount.isNotEmpty && pageIndex == 0
         ? AccountCards(
+            pageIndex: widget.pageIndex,
             onRefresh: _onRefresh,
-            creditAccounts: creditAccount,
-            debitAccounts: debitAccount,
+            accounts: creditAccount,
             type: AccountType.credit,
           )
-        : debitAccount.isNotEmpty && widget.index == 1
+        : debitAccount.isNotEmpty && pageIndex == 1
             ? AccountCards(
+                pageIndex: widget.pageIndex,
                 onRefresh: _onRefresh,
-                creditAccounts: creditAccount,
-                debitAccounts: debitAccount,
+                accounts: debitAccount,
                 type: AccountType.debit,
               )
-            : widget.index == 2 && expenses.isNotEmpty
+            : pageIndex == 2 && expenses.isNotEmpty
                 ? Expenses(
                     expenses: expenses,
                     expensesThisMonth: expensesThisMonth,
                     totalExpenses: totalExpenses,
                     totalExpensesThisMonth: totalExpensesThisMonth,
                   )
-                : widget.index == 3
+                : pageIndex == 3
                     ? const Settings()
                     : Container(
                         width: double.infinity,

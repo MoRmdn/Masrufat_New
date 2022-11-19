@@ -29,7 +29,8 @@ class _HomeScreenState extends State<HomeScreen>
   late Animation<double> animation;
   late CurvedAnimation curve;
   late Size dSize;
-  late AccountsProvider myProvider;
+  late AccountsProvider myProvider =
+      Provider.of<AccountsProvider>(context, listen: false);
 
   final iconList = <IconData>[
     Icons.account_balance_rounded,
@@ -40,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void initState() {
-    myProvider = Provider.of<AccountsProvider>(context, listen: false);
     Future.delayed(
       const Duration(milliseconds: 500),
       () => myProvider.fetchDataBaseBox(),
@@ -71,11 +71,6 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
@@ -95,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen>
         onRefresh: _onRefresh,
       ),
       body: NavigationScreen(
-        index: _bottomNavIndex,
+        pageIndex: _bottomNavIndex,
         iconData: iconList[_bottomNavIndex],
       ),
       floatingActionButton: ScaleTransition(

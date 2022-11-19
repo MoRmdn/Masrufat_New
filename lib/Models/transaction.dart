@@ -4,6 +4,13 @@ import 'accounts.dart';
 
 part 'transaction.g.dart';
 
+enum AccountTransferData {
+  formCreditToDebit,
+  formCreditToCredit,
+  formDebitToCredit,
+  formDebitToDebit,
+}
+
 @HiveType(typeId: 3)
 class Transactions extends HiveObject {
   @HiveField(0)
@@ -20,6 +27,8 @@ class Transactions extends HiveObject {
   Account? transferTo;
   @HiveField(6)
   Account? transferFrom;
+  @HiveField(7)
+  AccountTransferData? fromTo;
 
   Transactions({
     required this.id,
@@ -29,6 +38,7 @@ class Transactions extends HiveObject {
     required this.balance,
     this.transferTo,
     this.transferFrom,
+    this.fromTo,
   });
 
   factory Transactions.fromMap(Map map) {

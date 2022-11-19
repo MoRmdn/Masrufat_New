@@ -101,6 +101,7 @@ class _TransferMoneyState extends State<TransferMoney> {
         isIncome: true,
         balance: double.parse(transactionBalance),
         transferFrom: crAccount,
+        fromTo: AccountTransferData.formCreditToDebit,
       );
       final creditTrans = Transactions(
         id: timeAsID,
@@ -109,6 +110,7 @@ class _TransferMoneyState extends State<TransferMoney> {
         isIncome: false,
         balance: -double.parse(transactionBalance),
         transferTo: debitAccount,
+        fromTo: AccountTransferData.formCreditToDebit,
       );
       myProvider.addTransaction(
         existCreditAccount: crAccount,
@@ -128,6 +130,7 @@ class _TransferMoneyState extends State<TransferMoney> {
         isIncome: true,
         balance: double.parse(transactionBalance),
         transferTo: creditAccountToTransfer,
+        fromTo: AccountTransferData.formCreditToCredit,
       );
       final creditTransFrom = Transactions(
         id: timeAsID,
@@ -136,6 +139,7 @@ class _TransferMoneyState extends State<TransferMoney> {
         isIncome: false,
         balance: -double.parse(transactionBalance),
         transferFrom: crAccount,
+        fromTo: AccountTransferData.formCreditToCredit,
       );
       myProvider.addTransaction(
         existCreditAccount: crAccount,

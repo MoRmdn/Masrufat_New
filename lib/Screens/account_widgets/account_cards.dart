@@ -10,17 +10,19 @@ import 'package:provider/provider.dart';
 
 import '../../../Widgets/edit_delete_dialogs.dart';
 
+// ignore: must_be_immutable
 class AccountCards extends StatefulWidget {
-  final List<CreditAccount>? creditAccounts;
-  final List<DebitAccount>? debitAccounts;
-  final AccountType type;
+  List<Account> accounts;
+  int pageIndex;
+  AccountType type;
   final VoidCallback onRefresh;
-  const AccountCards({
+
+  AccountCards({
     Key? key,
     required this.type,
-    required this.creditAccounts,
-    required this.debitAccounts,
     required this.onRefresh,
+    required this.accounts,
+    required this.pageIndex,
   }) : super(key: key);
 
   @override
@@ -29,14 +31,13 @@ class AccountCards extends StatefulWidget {
 
 class _AccountCardsState extends State<AccountCards>
     with TickerProviderStateMixin {
-  late AccountsProvider myProvider;
-  bool isExpanded = true;
+  late AccountsProvider myProvider = Provider.of(context, listen: false);
   late AnimationController _animationController;
   late Animation<Size> _hightController;
+  bool isExpanded = true;
 
   @override
   void initState() {
-    myProvider = Provider.of(context, listen: false);
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -78,10 +79,11 @@ class _AccountCardsState extends State<AccountCards>
   @override
   Widget build(BuildContext context) {
     log('Account_Card');
-
-    final creditAccounts = widget.creditAccounts;
-    final debitAccounts = widget.debitAccounts;
-    final _type = widget.type;
+    AccountType type = widget.type;
+    int pageIndex = widget.pageIndex;
+    List<Account> accounts = pageIndex == 0
+        ? widget.accounts as List<CreditAccount>
+        : widget.accounts as List<DebitAccount>;
     final orientation = MediaQuery.of(context).orientation;
     const style = TextStyle(color: Colors.white, fontSize: 20);
     return RefreshIndicator(
@@ -121,7 +123,7 @@ class _AccountCardsState extends State<AccountCards>
                                     MainAxisAlignment.spaceEvenly,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  if (_type == AccountType.credit)
+                                  if (type == AccountType.credit)
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -154,7 +156,7 @@ class _AccountCardsState extends State<AccountCards>
                                       ),
                                       Expanded(
                                         child: Text(
-                                          _type == AccountType.credit
+                                          type == AccountType.credit
                                               ? '${snapShot.getTotalCreditBalance} \$'
                                               : '${snapShot.getTotalDebitBalance} \$',
                                           style: style,
@@ -197,9 +199,7 @@ class _AccountCardsState extends State<AccountCards>
             Expanded(
               child: GridView.builder(
                 physics: const ScrollPhysics(),
-                itemCount: _type == AccountType.credit
-                    ? creditAccounts!.length
-                    : debitAccounts!.length,
+                itemCount: accounts.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: orientation == Orientation.portrait ? 1 : 2,
                   childAspectRatio: 2.5,
@@ -211,25 +211,21 @@ class _AccountCardsState extends State<AccountCards>
                       ctx: context,
                       myProvider: myProvider,
                       onRefresh: _onRefresh,
-                      crAccount: _type == AccountType.credit
-                          ? creditAccounts![index]
+                      crAccount: type == AccountType.credit
+                          ? accounts[index] as CreditAccount
                           : null,
-                      drAccount: _type == AccountType.debit
-                          ? debitAccounts![index]
+                      drAccount: type == AccountType.debit
+                          ? accounts[index] as DebitAccount
                           : null,
-                      type: _type,
+                      type: type,
                     ),
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => AccountScreen(
-                          crAccount: _type == AccountType.credit
-                              ? creditAccounts![index]
-                              : null,
-                          drAccount: _type == AccountType.debit
-                              ? debitAccounts![index]
-                              : null,
+                          accountIndex: index,
+                          account: accounts[index],
                           onRefresh: _onRefresh,
-                          type: _type,
+                          type: type,
                         ),
                       ),
                     ),
@@ -238,19 +234,17 @@ class _AccountCardsState extends State<AccountCards>
                       confirmDismiss: (direction) => _onDismiss(),
                       onDismissed: (value) {
                         myProvider.deleteAccount(
-                          deleteUserCreditAccount: _type == AccountType.credit
-                              ? creditAccounts![index]
+                          deleteUserCreditAccount: type == AccountType.credit
+                              ? accounts[index] as CreditAccount
                               : null,
-                          deleteUserDebitAccount: _type == AccountType.debit
-                              ? debitAccounts![index]
+                          deleteUserDebitAccount: type == AccountType.debit
+                              ? accounts[index] as DebitAccount
                               : null,
                         );
                         _onRefresh();
                       },
                       key: Key(
-                        _type == AccountType.credit
-                            ? creditAccounts![index].id
-                            : debitAccounts![index].id,
+                        accounts[index].id,
                       ),
                       background: Container(
                         padding: const EdgeInsets.all(20),
@@ -275,9 +269,7 @@ class _AccountCardsState extends State<AccountCards>
                           ),
                           child: Center(
                             child: Text(
-                              _type == AccountType.credit
-                                  ? creditAccounts![index].name
-                                  : debitAccounts![index].name,
+                              accounts[index].name,
                               style: Theme.of(context).textTheme.displayLarge,
                             ),
                           ),

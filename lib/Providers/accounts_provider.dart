@@ -195,36 +195,24 @@ class AccountsProvider with ChangeNotifier {
   }
 
   Future<void> deleteTransaction({
-    required int index,
-    required CreditAccount? creditAccount,
-    required DebitAccount? debitAccount,
+    required int transIndex,
+    required int accountIndex,
+    required AccountType type,
+    required Transactions trans,
   }) async {
-    if (creditAccount != null) {
-      //? transaction i want to delete
-      final currentTransaction = creditAccount.transactions[index];
+    if (type == AccountType.credit) {
+      final crAccount = _userCreditAccounts[accountIndex];
+      crAccount.transactions.removeAt(transIndex);
 
-      //? subtract transaction value from total balance
+      _dataBaseBoxForCredit.put(crAccount.id, crAccount);
+      fetchCreditBalance();
+    } else {
+      final drAccount = _userDebitAccounts[accountIndex];
+      drAccount.transactions.removeAt(transIndex);
 
-      _totalCreditBalance -= currentTransaction.balance;
-      //? delete it
-      creditAccount.transactions
-          .removeWhere((element) => element.id == currentTransaction.id);
-      //* save account
-      _dataBaseBoxForCredit.put(creditAccount.id, creditAccount);
-    } else if (debitAccount != null) {
-      //? transaction i want to delete
-      final currentTransaction = debitAccount.transactions[index];
-
-      //? subtract transaction value from total balance
-      _totalDebitBalance -= currentTransaction.balance;
-      //? delete it
-      debitAccount.transactions
-          .removeWhere((element) => element.id == currentTransaction.id);
-      //* save account
-      _dataBaseBoxForDebit.put(debitAccount.id, debitAccount);
+      _dataBaseBoxForDebit.put(drAccount.id, drAccount);
+      fetchDebitBalance();
     }
-    _grandTotalBalance = _totalDebitBalance + _totalCreditBalance;
-    log('deleted Account');
     notifyListeners();
   }
 

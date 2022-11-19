@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:masrufat/Models/accounts.dart';
-import 'package:masrufat/Models/transaction.dart';
 import 'package:masrufat/Providers/accounts_provider.dart';
 import 'package:masrufat/dialog/custom_generic_dialog.dart';
 import 'package:masrufat/helper/app_config.dart';
 import 'package:provider/provider.dart';
 
+import '../../Models/transaction.dart';
 import 'add_transaction_bottom_sheet.dart';
 
-// ignore: must_be_immutable
 class TransactionCard extends StatefulWidget {
-  final CreditAccount? crAccount;
-  final DebitAccount? drAccount;
+  final Account account;
   final AccountType type;
   final Transactions trans;
+  final int accountIndex;
+  final int transactionIndex;
   final VoidCallback onRefresh;
   const TransactionCard({
     Key? key,
     required this.trans,
+    required this.account,
     required this.onRefresh,
-    required this.crAccount,
-    required this.drAccount,
     required this.type,
+    required this.transactionIndex,
+    required this.accountIndex,
   }) : super(key: key);
 
   @override
@@ -31,25 +32,19 @@ class TransactionCard extends StatefulWidget {
 
 class _TransactionCardState extends State<TransactionCard> {
   late Transactions transaction = widget.trans;
-  late CreditAccount? crAccount = widget.crAccount;
-  late DebitAccount? drAccount = widget.drAccount;
+  late Account account = widget.account;
+  late int transactionIndex = widget.transactionIndex;
+  late int accountIndex = widget.accountIndex;
   late final _type = widget.type;
-  final UniqueKey _key = UniqueKey();
   bool isExpanded = false;
-  late AccountsProvider myProvider;
-  @override
-  void initState() {
-    myProvider = Provider.of<AccountsProvider>(context, listen: false);
-    super.initState();
-  }
+  late AccountsProvider myProvider =
+      Provider.of<AccountsProvider>(context, listen: false);
 
   void _onRefresh() => setState(() {
         widget.onRefresh();
       });
 
-  void _onDeleteTransaction(int index) {
-    final crAccount = widget.crAccount;
-    final drAccount = widget.drAccount;
+  void _onDeleteTransaction() {
     customGenericDialog(
       context: context,
       title: AppConfig.dialogConfirmationTitle,
@@ -58,13 +53,13 @@ class _TransactionCardState extends State<TransactionCard> {
         'No': null,
         'Yes': () async => await myProvider
                 .deleteTransaction(
-                  index: index,
-                  creditAccount: crAccount,
-                  debitAccount: drAccount,
+                  trans: account.transactions[transactionIndex],
+                  type: _type,
+                  transIndex: transactionIndex,
+                  accountIndex: accountIndex,
                 )
                 .then((value) => Navigator.of(context).pop())
                 .then((value) {
-              widget.onRefresh();
               _onRefresh();
             })
       },
@@ -73,20 +68,12 @@ class _TransactionCardState extends State<TransactionCard> {
 
   @override
   Widget build(BuildContext context) {
-    int index;
-
-    if (_type == AccountType.credit) {
-      index = crAccount!.transactions
-          .indexWhere((element) => element.id == transaction.id);
-    } else {
-      index = drAccount!.transactions
-          .indexWhere((element) => element.id == transaction.id);
-    }
     final incomeStyle = TextStyle(
-      color: transaction.isIncome ? Colors.black : Colors.white,
+      color: account.transactions[transactionIndex].isIncome
+          ? Colors.black
+          : Colors.white,
     );
     return Column(
-      key: _key,
       mainAxisSize: MainAxisSize.min,
       children: [
         Card(
@@ -100,20 +87,24 @@ class _TransactionCardState extends State<TransactionCard> {
               bottomRight: Radius.circular(isExpanded ? 0 : 20),
             ),
           ),
-          color: transaction.isIncome ? Colors.green : Colors.red,
+          color: account.transactions[transactionIndex].isIncome
+              ? Colors.green
+              : Colors.red,
           child: ListTile(
             title: Text(
-              transaction.name,
+              account.transactions[transactionIndex].name,
               style: incomeStyle,
             ),
             subtitle: Text(
               DateFormat('MMM d,h:mm a')
-                  .format(DateTime.parse(transaction.id))
+                  .format(
+                    DateTime.parse(account.transactions[transactionIndex].id),
+                  )
                   .toString(),
               style: incomeStyle,
             ),
             leading: Text(
-              transaction.balance.toString(),
+              account.transactions[transactionIndex].balance.toString(),
               style: incomeStyle,
             ),
             trailing: GestureDetector(
@@ -144,7 +135,7 @@ class _TransactionCardState extends State<TransactionCard> {
             ),
             child: Column(
               children: [
-                Text(transaction.description),
+                Text(account.transactions[transactionIndex].description),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -160,11 +151,10 @@ class _TransactionCardState extends State<TransactionCard> {
                                     MediaQuery.of(context).viewInsets.bottom,
                               ),
                               child: AddTransactionBottomSheet(
-                                transIndex: index,
+                                transIndex: transactionIndex,
                                 isUpdate: true,
                                 reFresh: _onRefresh,
-                                crAccount: crAccount,
-                                drAccount: drAccount,
+                                account: account,
                                 type: _type,
                               ),
                             );
@@ -197,12 +187,20 @@ class _TransactionCardState extends State<TransactionCard> {
                     ),
                     Expanded(
                       child: TextButton(
-                        onPressed: () => _onDeleteTransaction(index),
+                        onPressed: _onDeleteTransaction,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: const [
-                            Text(AppConfig.delete),
-                            Icon(Icons.delete),
+                          children: [
+                            Text(
+                              AppConfig.delete,
+                              style: TextStyle(
+                                color: Theme.of(context).errorColor,
+                              ),
+                            ),
+                            Icon(
+                              Icons.delete,
+                              color: Theme.of(context).errorColor,
+                            ),
                           ],
                         ),
                       ),

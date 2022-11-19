@@ -15,8 +15,7 @@ enum TansMood {
 }
 
 class AddTransactionBottomSheet extends StatefulWidget {
-  final CreditAccount? crAccount;
-  final DebitAccount? drAccount;
+  final Account account;
   final AccountType type;
   final VoidCallback reFresh;
   final int? transIndex;
@@ -26,8 +25,7 @@ class AddTransactionBottomSheet extends StatefulWidget {
     required this.reFresh,
     this.isUpdate,
     this.transIndex,
-    required this.crAccount,
-    required this.drAccount,
+    required this.account,
     required this.type,
   }) : super(key: key);
 
@@ -46,6 +44,9 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
   bool switchValue = false;
   TansMood mood = TansMood.add;
   final loading = LoadingScreen.instance();
+  late AccountType type = widget.type;
+  late int index = widget.transIndex!;
+  late Account account = widget.account;
 
   @override
   void initState() {
@@ -74,24 +75,18 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
       });
 
   void _updateMode() => setState(() {
-        final type = widget.type;
-        final index = widget.transIndex!;
-        final crAccount = widget.crAccount;
-        final drAccount = widget.drAccount;
         if (type == AccountType.credit) {
-          transactionNameController.text = crAccount!.transactions[index].name;
+          transactionNameController.text = account.transactions[index].name;
           balanceController.text =
-              crAccount.transactions[index].balance.abs().toString();
-          descriptionController.text =
-              crAccount.transactions[index].description;
-          switchValue = crAccount.transactions[index].isIncome;
+              account.transactions[index].balance.abs().toString();
+          descriptionController.text = account.transactions[index].description;
+          switchValue = account.transactions[index].isIncome;
         } else {
-          transactionNameController.text = drAccount!.transactions[index].name;
+          transactionNameController.text = account.transactions[index].name;
           balanceController.text =
-              drAccount.transactions[index].balance.abs().toString();
-          descriptionController.text =
-              drAccount.transactions[index].description;
-          switchValue = drAccount.transactions[index].isIncome;
+              account.transactions[index].balance.abs().toString();
+          descriptionController.text = account.transactions[index].description;
+          switchValue = account.transactions[index].isIncome;
         }
       });
 
@@ -113,15 +108,11 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
       );
       return;
     }
-    final type = widget.type;
-    final index = widget.transIndex!;
-    final crAccount = widget.crAccount;
-    final drAccount = widget.drAccount;
 
     if (type == AccountType.credit) {
       if (switchValue) {
         final newTrans = Transactions(
-          id: crAccount!.transactions[index].id,
+          id: account.transactions[index].id,
           name: name,
           description: description,
           isIncome: switchValue,
@@ -129,19 +120,19 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         );
         myProvider.updateTransaction(
           newTransaction: newTrans,
-          creditAccount: crAccount,
+          creditAccount: account as CreditAccount,
           debitAccount: null,
         );
       } else {
         final newTrans = Transactions(
-          id: crAccount!.transactions[index].id,
+          id: account.transactions[index].id,
           name: name,
           description: description,
           isIncome: switchValue,
           balance: -double.parse(balance),
         );
         myProvider.updateTransaction(
-          creditAccount: crAccount,
+          creditAccount: account as CreditAccount,
           newTransaction: newTrans,
           debitAccount: null,
         );
@@ -149,7 +140,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
     } else {
       if (switchValue) {
         final newTrans = Transactions(
-          id: drAccount!.transactions[index].id,
+          id: account.transactions[index].id,
           name: name,
           description: description,
           isIncome: switchValue,
@@ -158,11 +149,11 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         myProvider.updateTransaction(
           creditAccount: null,
           newTransaction: newTrans,
-          debitAccount: drAccount,
+          debitAccount: account as DebitAccount,
         );
       } else {
         final newTrans = Transactions(
-          id: drAccount!.transactions[index].id,
+          id: account.transactions[index].id,
           name: name,
           description: description,
           isIncome: switchValue,
@@ -171,7 +162,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         myProvider.updateTransaction(
           creditAccount: null,
           newTransaction: newTrans,
-          debitAccount: drAccount,
+          debitAccount: account as DebitAccount,
         );
       }
     }
@@ -184,8 +175,6 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
   void _onAddTransaction() {
     final type = widget.type;
 
-    final crAccount = widget.crAccount;
-    final drAccount = widget.drAccount;
     loading.show(context: context, content: AppConfig.pleaseWait);
     final description = descriptionController.text;
     final transactionName = transactionNameController.text;
@@ -216,7 +205,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
           balance: double.parse(transactionBalance),
         );
         myProvider.addTransaction(
-          existCreditAccount: crAccount,
+          existCreditAccount: account as CreditAccount,
           newTransaction: newTrans,
           existDebitAccount: null,
         );
@@ -229,7 +218,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
           balance: -double.parse(transactionBalance),
         );
         myProvider.addTransaction(
-          existCreditAccount: crAccount,
+          existCreditAccount: account as CreditAccount,
           newTransaction: newTrans,
           existDebitAccount: null,
         );
@@ -246,7 +235,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         myProvider.addTransaction(
           existCreditAccount: null,
           newTransaction: newTrans,
-          existDebitAccount: drAccount,
+          existDebitAccount: account as DebitAccount,
         );
       } else {
         final newTrans = Transactions(
@@ -259,7 +248,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
         myProvider.addTransaction(
           existCreditAccount: null,
           newTransaction: newTrans,
-          existDebitAccount: drAccount,
+          existDebitAccount: account as DebitAccount,
         );
       }
     }
@@ -315,7 +304,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'is it income ?',
+                  AppConfig.transactionIsIncome,
                   style: Theme.of(context).textTheme.headline5,
                 ),
                 Switch(
