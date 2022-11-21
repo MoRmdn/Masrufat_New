@@ -113,8 +113,10 @@ class _TransactionCardState extends State<TransactionCard> {
                   isExpanded = !isExpanded;
                 });
               },
-              child: const Icon(
-                Icons.arrow_drop_down_circle,
+              child: Icon(
+                !isExpanded
+                    ? Icons.arrow_drop_down_circle
+                    : Icons.arrow_drop_up_sharp,
                 color: Colors.white,
               ),
             ),

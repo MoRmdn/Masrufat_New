@@ -164,22 +164,24 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
             ),
           ),
-          const SizedBox(
-            height: 20,
-          ),
-          ListView.builder(
-            reverse: true,
-            shrinkWrap: true,
-            itemCount: account.transactions.length,
-            itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TransactionCard(
-                accountIndex: accountIndex,
-                transactionIndex: index,
-                trans: account.transactions[index],
-                account: account,
-                type: _type,
-                onRefresh: _onRefresh,
+          Expanded(
+            child: SingleChildScrollView(
+              child: ListView.builder(
+                physics: const ScrollPhysics(),
+                reverse: true,
+                shrinkWrap: true,
+                itemCount: account.transactions.length,
+                itemBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TransactionCard(
+                    accountIndex: accountIndex,
+                    transactionIndex: index,
+                    trans: account.transactions[index],
+                    account: account,
+                    type: _type,
+                    onRefresh: _onRefresh,
+                  ),
+                ),
               ),
             ),
           ),
